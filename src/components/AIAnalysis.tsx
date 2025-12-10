@@ -1,6 +1,6 @@
-import React from 'react';
-import { Sparkles, Brain, Shield, AlertTriangle, CheckCircle } from 'lucide-react';
-import { LLMProviderSelector } from './LLMProviderSelector';
+import { AlertTriangle, Brain, CheckCircle, Shield, Sparkles } from "lucide-react";
+import React from "react";
+import { LLMProviderSelector } from "./LLMProviderSelector";
 
 interface AIAnalysisProps {
   analysis: string | null;
@@ -30,36 +30,38 @@ export function AIAnalysis({
   const formatAnalysis = (text: string) => {
     // Split by common markdown headers and format
     const sections = text.split(/(?=##\s)/);
-    
+
     return sections.map((section, index) => {
       if (!section.trim()) return null;
-      
-      const lines = section.trim().split('\n');
+
+      const lines = section.trim().split("\n");
       const header = lines[0];
-      const content = lines.slice(1).join('\n');
-      
-      if (header.startsWith('##')) {
-        const title = header.replace(/^##\s*/, '');
+      const content = lines.slice(1).join("\n");
+
+      if (header.startsWith("##")) {
+        const title = header.replace(/^##\s*/, "");
         return (
           <div key={index} className="mb-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3 flex items-center">
-              {title.toLowerCase().includes('recommendation') && <CheckCircle className="w-5 h-5 mr-2 text-green-500" />}
-              {title.toLowerCase().includes('threat') && <AlertTriangle className="w-5 h-5 mr-2 text-red-500" />}
-              {title.toLowerCase().includes('security') && <Shield className="w-5 h-5 mr-2 text-blue-500" />}
+              {title.toLowerCase().includes("recommendation") && (
+                <CheckCircle className="w-5 h-5 mr-2 text-green-500" />
+              )}
+              {title.toLowerCase().includes("threat") && <AlertTriangle className="w-5 h-5 mr-2 text-red-500" />}
+              {title.toLowerCase().includes("security") && <Shield className="w-5 h-5 mr-2 text-blue-500" />}
               {title}
             </h3>
             <div className="prose prose-sm dark:prose-invert max-w-none">
-              {content.split('\n').map((line, lineIndex) => {
-                if (line.trim().startsWith('- ')) {
+              {content.split("\n").map((line, lineIndex) => {
+                if (line.trim().startsWith("- ")) {
                   return (
                     <li key={lineIndex} className="ml-4 mb-1 text-gray-700 dark:text-gray-300">
-                      {line.replace(/^-\s*/, '')}
+                      {line.replace(/^-\s*/, "")}
                     </li>
                   );
-                } else if (line.trim().startsWith('* ')) {
+                } else if (line.trim().startsWith("* ")) {
                   return (
                     <li key={lineIndex} className="ml-4 mb-1 text-gray-700 dark:text-gray-300">
-                      {line.replace(/^\*\s*/, '')}
+                      {line.replace(/^\*\s*/, "")}
                     </li>
                   );
                 } else if (line.trim()) {
@@ -75,7 +77,7 @@ export function AIAnalysis({
           </div>
         );
       }
-      
+
       return (
         <div key={index} className="mb-4">
           <p className="text-gray-700 dark:text-gray-300">{section}</p>
@@ -100,14 +102,14 @@ export function AIAnalysis({
             </p>
           </div>
         </div>
-        
+
         <button
           onClick={onAnalyze}
           disabled={isLoading || !canAnalyze}
           className="flex items-center space-x-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors"
         >
           <Sparkles className="w-4 h-4" />
-          <span>{isLoading ? 'Analyzing...' : 'Get AI Analysis'}</span>
+          <span>{isLoading ? "Analyzing..." : "Get AI Analysis"}</span>
         </button>
       </div>
 
@@ -131,7 +133,7 @@ export function AIAnalysis({
               Analysis Complete
             </span>
           </div>
-          
+
           <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
             <div className="space-y-4">
               {formatAnalysis(analysis)}

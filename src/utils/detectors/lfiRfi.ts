@@ -1,4 +1,4 @@
-import { ParsedLogEntry } from '../logParser';
+import { ParsedLogEntry } from "../logParser";
 
 export function detectLfiRfi(entries: ParsedLogEntry[]): ParsedLogEntry[] {
   const pattern = /(etc\/passwd|proc\/self\/environ|input_file=|data:text)/i;
@@ -9,6 +9,6 @@ export function detectLfiRfi(entries: ParsedLogEntry[]): ParsedLogEntry[] {
 
   return suspicious.map(entry => ({
     ...entry,
-    suspicion_reason: 'LFI/RFI pattern detected'
+    suspicion_reason: "LFI/RFI pattern detected",
   }));
 }

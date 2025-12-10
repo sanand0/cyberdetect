@@ -12,7 +12,8 @@ export interface ParsedLogEntry {
   server_ip: string;
 }
 
-const LOG_PATTERN = /(?<ip>\S+) - - \[(?<timestamp>.*?)\] "(?<method>\S+) (?<path>\S+) (?<protocol>[^"]+)" (?<status>\d{3}) (?<bytes>\S+) "(?<referrer>[^"]*)" "(?<user_agent>[^"]*)" (?<host>\S+) (?<server_ip>\S+)/;
+const LOG_PATTERN =
+  /(?<ip>\S+) - - \[(?<timestamp>.*?)\] "(?<method>\S+) (?<path>\S+) (?<protocol>[^"]+)" (?<status>\d{3}) (?<bytes>\S+) "(?<referrer>[^"]*)" "(?<user_agent>[^"]*)" (?<host>\S+) (?<server_ip>\S+)/;
 
 function parseTimestamp(timestamp: string): string {
   // Convert timestamp from log format to ISO string
@@ -23,30 +24,39 @@ function parseTimestamp(timestamp: string): string {
     if (!match) {
       return timestamp;
     }
-    
+
     const [, day, monthName, year, hour, minute, second, timezone] = match;
-    
+
     // Convert month name to number
     const monthMap: Record<string, string> = {
-      'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04',
-      'May': '05', 'Jun': '06', 'Jul': '07', 'Aug': '08',
-      'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12'
+      "Jan": "01",
+      "Feb": "02",
+      "Mar": "03",
+      "Apr": "04",
+      "May": "05",
+      "Jun": "06",
+      "Jul": "07",
+      "Aug": "08",
+      "Sep": "09",
+      "Oct": "10",
+      "Nov": "11",
+      "Dec": "12",
     };
-    
+
     const month = monthMap[monthName];
     if (!month) {
       return timestamp;
     }
-    
+
     // Create ISO format string: YYYY-MM-DDTHH:MM:SS+TIMEZONE
     const isoString = `${year}-${month}-${day}T${hour}:${minute}:${second}${timezone}`;
-    
+
     // Validate the date by creating a Date object
     const date = new Date(isoString);
     if (isNaN(date.getTime())) {
       return timestamp;
     }
-    
+
     return date.toISOString();
   } catch {
     // If parsing fails, return original timestamp
@@ -55,7 +65,7 @@ function parseTimestamp(timestamp: string): string {
 }
 
 export function parseLogFile(content: string): ParsedLogEntry[] {
-  const lines = content.split('\n');
+  const lines = content.split("\n");
   const parsed: ParsedLogEntry[] = [];
 
   for (const line of lines) {
@@ -103,7 +113,7 @@ export function convertToDataFrame(entries: ParsedLogEntry[]) {
     df.path.push(entry.path);
     df.protocol.push(entry.protocol);
     df.status.push(entry.status);
-    df.bytes.push(entry.bytes === '-' ? '0' : entry.bytes);
+    df.bytes.push(entry.bytes === "-" ? "0" : entry.bytes);
     df.referrer.push(entry.referrer);
     df.user_agent.push(entry.user_agent);
     df.host.push(entry.host);

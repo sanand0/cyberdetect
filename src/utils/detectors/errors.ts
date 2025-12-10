@@ -1,7 +1,7 @@
-import { ParsedLogEntry } from '../logParser';
+import { ParsedLogEntry } from "../logParser";
 
 export function detectErrors(entries: ParsedLogEntry[]): ParsedLogEntry[] {
-  const badStatuses = ['403', '404', '406', '500', '502'];
+  const badStatuses = ["403", "404", "406", "500", "502"];
 
   const errors = entries.filter(entry => {
     return badStatuses.includes(entry.status);
@@ -9,6 +9,6 @@ export function detectErrors(entries: ParsedLogEntry[]): ParsedLogEntry[] {
 
   return errors.map(entry => ({
     ...entry,
-    suspicion_reason: `HTTP error status: ${entry.status}`
+    suspicion_reason: `HTTP error status: ${entry.status}`,
   }));
 }

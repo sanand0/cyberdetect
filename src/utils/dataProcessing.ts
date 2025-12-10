@@ -1,14 +1,14 @@
-import { LogEntry, ProcessedLogEntry } from '../types';
+import { LogEntry, ProcessedLogEntry } from "../types";
 
 export function processLogData(
   data: any,
-  attackType: string
+  attackType: string,
 ): ProcessedLogEntry[] {
   if (
-    !data ||
-    typeof data !== 'object' ||
-    !Array.isArray(data.ip) ||
-    data.ip.length === 0
+    !data
+    || typeof data !== "object"
+    || !Array.isArray(data.ip)
+    || data.ip.length === 0
   ) {
     return [];
   }
@@ -25,7 +25,7 @@ export function processLogData(
     user_agent = [],
     host = [],
     server_ip = [],
-    suspicion_reason = []
+    suspicion_reason = [],
   } = data;
 
   const length = ip.length;
@@ -33,18 +33,18 @@ export function processLogData(
 
   for (let i = 0; i < length; i++) {
     entries.push({
-      ip: ip[i] || '',
-      timestamp: timestamp[i] || '',
-      method: method[i] || '',
-      path: path[i] || '',
-      protocol: protocol[i] || '',
+      ip: ip[i] || "",
+      timestamp: timestamp[i] || "",
+      method: method[i] || "",
+      path: path[i] || "",
+      protocol: protocol[i] || "",
       status: status[i] || 0,
       bytes: bytes[i] || 0,
-      referrer: referrer[i] || '',
-      user_agent: user_agent[i] || '',
-      host: host[i] || '',
-      server_ip: server_ip[i] || '',
-      suspicion_reason: suspicion_reason[i] || '',
+      referrer: referrer[i] || "",
+      user_agent: user_agent[i] || "",
+      host: host[i] || "",
+      server_ip: server_ip[i] || "",
+      suspicion_reason: suspicion_reason[i] || "",
       attack_type: attackType,
     });
   }
@@ -54,39 +54,41 @@ export function processLogData(
 
 export function exportToCSV(data: ProcessedLogEntry[]): string {
   const headers = [
-    'IP',
-    'Timestamp',
-    'Method',
-    'Path',
-    'Protocol',
-    'Status',
-    'Bytes',
-    'Referrer',
-    'User Agent',
-    'Host',
-    'Server IP',
-    'Suspicion Reason',
-    'Attack Type'
+    "IP",
+    "Timestamp",
+    "Method",
+    "Path",
+    "Protocol",
+    "Status",
+    "Bytes",
+    "Referrer",
+    "User Agent",
+    "Host",
+    "Server IP",
+    "Suspicion Reason",
+    "Attack Type",
   ];
 
   const csvContent = [
-    headers.join(','),
-    ...data.map(row => [
-      row.ip,
-      row.timestamp,
-      row.method,
-      `"${row.path.replace(/"/g, '""')}"`,
-      row.protocol,
-      row.status,
-      row.bytes,
-      `"${row.referrer.replace(/"/g, '""')}"`,
-      `"${row.user_agent.replace(/"/g, '""')}"`,
-      row.host,
-      row.server_ip,
-      `"${row.suspicion_reason.replace(/"/g, '""')}"`,
-      row.attack_type
-    ].join(','))
-  ].join('\n');
+    headers.join(","),
+    ...data.map(row =>
+      [
+        row.ip,
+        row.timestamp,
+        row.method,
+        `"${row.path.replace(/"/g, "\"\"")}"`,
+        row.protocol,
+        row.status,
+        row.bytes,
+        `"${row.referrer.replace(/"/g, "\"\"")}"`,
+        `"${row.user_agent.replace(/"/g, "\"\"")}"`,
+        row.host,
+        row.server_ip,
+        `"${row.suspicion_reason.replace(/"/g, "\"\"")}"`,
+        row.attack_type,
+      ].join(",")
+    ),
+  ].join("\n");
 
   return csvContent;
 }
@@ -98,7 +100,7 @@ export function exportToJSON(data: ProcessedLogEntry[]): string {
 export function downloadFile(content: string, filename: string, contentType: string) {
   const blob = new Blob([content], { type: contentType });
   const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
+  const link = document.createElement("a");
   link.href = url;
   link.download = filename;
   document.body.appendChild(link);

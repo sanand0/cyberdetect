@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { ChevronDown, Settings, Key, Globe, ExternalLink } from 'lucide-react';
-import { LLM_PROVIDERS, LLMProvider } from '../services/llmProviders';
+import { ChevronDown, ExternalLink, Globe, Key, Settings } from "lucide-react";
+import React, { useState } from "react";
+import { LLM_PROVIDERS, LLMProvider } from "../services/llmProviders";
 
 interface LLMProviderSelectorProps {
   selectedProvider: string;
@@ -26,10 +26,10 @@ export function LLMProviderSelector({
 
   const getProviderLinks = (providerId: string) => {
     const links: { [key: string]: string } = {
-      gemini: 'https://makersuite.google.com/app/apikey',
-      openai: 'https://platform.openai.com/api-keys',
-      anthropic: 'https://console.anthropic.com/account/keys',
-      aipipe: 'https://aipipe.org/',
+      gemini: "https://makersuite.google.com/app/apikey",
+      openai: "https://platform.openai.com/api-keys",
+      anthropic: "https://console.anthropic.com/account/keys",
+      aipipe: "https://aipipe.org/",
     };
     return links[providerId];
   };
@@ -58,7 +58,7 @@ export function LLMProviderSelector({
               </div>
             </div>
           </div>
-          <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+          <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${isOpen ? "rotate-180" : ""}`} />
         </button>
 
         {isOpen && (
@@ -71,7 +71,7 @@ export function LLMProviderSelector({
                   setIsOpen(false);
                 }}
                 className={`w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-600 flex items-center space-x-3 ${
-                  selectedProvider === provider.id ? 'bg-purple-50 dark:bg-purple-900/20' : ''
+                  selectedProvider === provider.id ? "bg-purple-50 dark:bg-purple-900/20" : ""
                 }`}
               >
                 <div className="w-8 h-8 bg-purple-100 dark:bg-purple-900/20 rounded-lg flex items-center justify-center">
@@ -85,9 +85,7 @@ export function LLMProviderSelector({
                     {provider.description}
                   </div>
                 </div>
-                {selectedProvider === provider.id && (
-                  <div className="w-2 h-2 bg-purple-600 rounded-full" />
-                )}
+                {selectedProvider === provider.id && <div className="w-2 h-2 bg-purple-600 rounded-full" />}
               </button>
             ))}
           </div>
@@ -136,7 +134,7 @@ export function LLMProviderSelector({
             <Globe className="w-5 h-5 text-gray-400" />
             <input
               type="url"
-              placeholder={currentProvider.defaultEndpoint || 'https://api.example.com/v1/chat/completions'}
+              placeholder={currentProvider.defaultEndpoint || "https://api.example.com/v1/chat/completions"}
               value={customEndpoint}
               onChange={(e) => onCustomEndpointChange(e.target.value)}
               className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
@@ -154,8 +152,8 @@ export function LLMProviderSelector({
         className="text-sm text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 flex items-center space-x-1"
       >
         <Settings className="w-4 h-4" />
-        <span>{showAdvanced ? 'Hide' : 'Show'} Advanced Settings</span>
-        <ChevronDown className={`w-4 h-4 transition-transform ${showAdvanced ? 'rotate-180' : ''}`} />
+        <span>{showAdvanced ? "Hide" : "Show"} Advanced Settings</span>
+        <ChevronDown className={`w-4 h-4 transition-transform ${showAdvanced ? "rotate-180" : ""}`} />
       </button>
 
       {/* Advanced Settings */}
@@ -178,7 +176,7 @@ export function LLMProviderSelector({
               <span>More Creative</span>
             </div>
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Max Tokens

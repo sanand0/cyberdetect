@@ -1,6 +1,6 @@
-import { llmService } from './llmProviders';
-import { ProcessedLogEntry, AnalysisSummary } from '../types';
-import { ATTACK_TYPES } from '../config/attackTypes';
+import { ATTACK_TYPES } from "../config/attackTypes";
+import { AnalysisSummary, ProcessedLogEntry } from "../types";
+import { llmService } from "./llmProviders";
 
 export interface ReportConfig {
   providerId: string;
@@ -14,10 +14,10 @@ export class ReportGenerationService {
     summary: AnalysisSummary,
     datasetUrl: string,
     fileName?: string,
-    config?: ReportConfig
+    config?: ReportConfig,
   ): Promise<string> {
     if (!config || !this.canGenerateReport(config)) {
-      throw new Error('Invalid report configuration');
+      throw new Error("Invalid report configuration");
     }
 
     const reportData = this.prepareReportData(allResults, summary, fileName, datasetUrl);
@@ -32,24 +32,24 @@ export class ReportGenerationService {
         {
           temperature: 0.3, // Lower temperature for more consistent reports
           maxTokens: 4000,
-        }
+        },
       );
 
       // Clean up the response to remove markdown code block fences
       let cleanedText = response.text.trim();
-      
+
       // Remove markdown code block delimiters if present
-      cleanedText = cleanedText.replace(/^```markdown\s*\n?/i, '');
-      cleanedText = cleanedText.replace(/^```\s*\n?/i, '');
-      cleanedText = cleanedText.replace(/\n?```\s*$/i, '');
-      
+      cleanedText = cleanedText.replace(/^```markdown\s*\n?/i, "");
+      cleanedText = cleanedText.replace(/^```\s*\n?/i, "");
+      cleanedText = cleanedText.replace(/\n?```\s*$/i, "");
+
       // Remove any leading/trailing whitespace after cleanup
       cleanedText = cleanedText.trim();
-      
+
       return cleanedText;
     } catch (error) {
-      console.error('Report generation failed:', error);
-      throw new Error(`Failed to generate report: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      console.error("Report generation failed:", error);
+      throw new Error(`Failed to generate report: ${error instanceof Error ? error.message : "Unknown error"}`);
     }
   }
 
@@ -57,7 +57,7 @@ export class ReportGenerationService {
     allResults: ProcessedLogEntry[],
     summary: AnalysisSummary,
     fileName?: string,
-    datasetUrl?: string
+    datasetUrl?: string,
   ) {
     // Get top attack types
     const topAttackTypes = Object.entries(summary.attackTypeCounts)
@@ -90,13 +90,13 @@ export class ReportGenerationService {
     // Get geographic distribution (based on IP ranges)
     const ipRanges: Record<string, number> = {};
     allResults.forEach(entry => {
-      const ipPrefix = entry.ip.split('.').slice(0, 2).join('.');
+      const ipPrefix = entry.ip.split(".").slice(0, 2).join(".");
       ipRanges[ipPrefix] = (ipRanges[ipPrefix] || 0) + 1;
     });
 
     return {
-      fileName: fileName || 'Unknown',
-      datasetUrl: datasetUrl || 'Unknown',
+      fileName: fileName || "Unknown",
+      datasetUrl: datasetUrl || "Unknown",
       totalThreats: summary.totalThreats,
       uniqueAttackers: summary.topAttackers.length,
       analysisDate: new Date().toISOString(),
@@ -115,15 +115,15 @@ export class ReportGenerationService {
     const findings = [];
 
     // High-severity attack types with significant activity
-    const highSeverityTypes = ['SQL Injection', 'Path Traversal', 'LFI/RFI Attacks', 'Brute Force'];
+    const highSeverityTypes = ["SQL Injection", "Path Traversal", "LFI/RFI Attacks", "Brute Force"];
     highSeverityTypes.forEach(type => {
       const count = summary.attackTypeCounts[type] || 0;
       if (count > 10) {
         findings.push({
-          severity: 'HIGH',
+          severity: "HIGH",
           type,
           count,
-          description: `Significant ${type.toLowerCase()} activity detected`
+          description: `Significant ${type.toLowerCase()} activity detected`,
         });
       }
     });
@@ -132,23 +132,23 @@ export class ReportGenerationService {
     summary.topAttackers.slice(0, 3).forEach(attacker => {
       if (attacker.count > 50) {
         findings.push({
-          severity: 'HIGH',
-          type: 'Persistent Attacker',
+          severity: "HIGH",
+          type: "Persistent Attacker",
           count: attacker.count,
-          description: `IP ${attacker.ip} shows persistent attack behavior`
+          description: `IP ${attacker.ip} shows persistent attack behavior`,
         });
       }
     });
 
     // High error rates
-    const errorCodes = ['403', '404', '500', '502'];
+    const errorCodes = ["403", "404", "500", "502"];
     const totalErrors = errorCodes.reduce((sum, code) => sum + (summary.statusCodeDistribution[code] || 0), 0);
     if (totalErrors > allResults.length * 0.3) {
       findings.push({
-        severity: 'MEDIUM',
-        type: 'High Error Rate',
+        severity: "MEDIUM",
+        type: "High Error Rate",
         count: totalErrors,
-        description: 'Unusually high number of HTTP errors detected'
+        description: "Unusually high number of HTTP errors detected",
       });
     }
 
@@ -168,22 +168,26 @@ You are a cybersecurity analyst. Generate a comprehensive security analysis repo
 - Recent Activity (24h): ${data.recentAttacks} threats
 
 **Attack Type Distribution:**
-${data.topAttackTypes.map(([type, count]: [string, number]) => `- ${type}: ${count} incidents`).join('\n')}
+${data.topAttackTypes.map(([type, count]: [string, number]) => `- ${type}: ${count} incidents`).join("\n")}
 
 **Top Attackers:**
-${data.topAttackers.map((attacker: any) => `- ${attacker.ip}: ${attacker.count} attempts`).join('\n')}
+${data.topAttackers.map((attacker: any) => `- ${attacker.ip}: ${attacker.count} attempts`).join("\n")}
 
 **Most Targeted Paths:**
-${data.topPaths.map(([path, count]: [string, number]) => `- ${path}: ${count} requests`).join('\n')}
+${data.topPaths.map(([path, count]: [string, number]) => `- ${path}: ${count} requests`).join("\n")}
 
 **HTTP Methods:**
-${data.methodCounts.map(([method, count]: [string, number]) => `- ${method}: ${count} requests`).join('\n')}
+${data.methodCounts.map(([method, count]: [string, number]) => `- ${method}: ${count} requests`).join("\n")}
 
 **Status Code Distribution:**
-${Object.entries(data.statusCodeDistribution).map(([code, count]) => `- ${code}: ${count} responses`).join('\n')}
+${Object.entries(data.statusCodeDistribution).map(([code, count]) => `- ${code}: ${count} responses`).join("\n")}
 
 **Critical Findings:**
-${data.criticalFindings.map((finding: any) => `- [${finding.severity}] ${finding.description} (${finding.count} incidents)`).join('\n')}
+${
+      data.criticalFindings.map((finding: any) =>
+        `- [${finding.severity}] ${finding.description} (${finding.count} incidents)`
+      ).join("\n")
+    }
 
 Please generate a professional security analysis report in Markdown format that includes:
 

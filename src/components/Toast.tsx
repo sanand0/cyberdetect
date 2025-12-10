@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
-import { CheckCircle, XCircle, AlertCircle, Info, X } from 'lucide-react';
-import { Toast as ToastType } from '../types';
+import { AlertCircle, CheckCircle, Info, X, XCircle } from "lucide-react";
+import React, { useEffect } from "react";
+import { Toast as ToastType } from "../types";
 
 interface ToastProps {
   toast: ToastType;
@@ -15,10 +15,10 @@ const iconMap = {
 };
 
 const colorMap = {
-  success: 'bg-green-500',
-  error: 'bg-red-500',
-  warning: 'bg-yellow-500',
-  info: 'bg-blue-500',
+  success: "bg-green-500",
+  error: "bg-red-500",
+  warning: "bg-yellow-500",
+  info: "bg-blue-500",
 };
 
 export function Toast({ toast, onRemove }: ToastProps) {
@@ -30,7 +30,11 @@ export function Toast({ toast, onRemove }: ToastProps) {
   }, []);
 
   return (
-    <div className={`${colorMap[toast.type]} text-white p-4 rounded-lg shadow-lg flex items-center space-x-3 min-w-80 max-w-md animate-slide-in`}>
+    <div
+      className={`${
+        colorMap[toast.type]
+      } text-white p-4 rounded-lg shadow-lg flex items-center space-x-3 min-w-80 max-w-md animate-slide-in`}
+    >
       <Icon className="w-5 h-5 flex-shrink-0" />
       <p className="flex-1 text-sm font-medium">{toast.message}</p>
       <button

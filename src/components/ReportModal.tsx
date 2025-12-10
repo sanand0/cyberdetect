@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { X, FileBarChart, Download, Copy, Check, Settings, Sparkles } from 'lucide-react';
-import { marked } from 'marked';
-import { LLMProviderSelector } from './LLMProviderSelector';
+import { Check, Copy, Download, FileBarChart, Settings, Sparkles, X } from "lucide-react";
+import { marked } from "marked";
+import React, { useState } from "react";
+import { LLMProviderSelector } from "./LLMProviderSelector";
 
 interface ReportModalProps {
   isOpen: boolean;
@@ -38,7 +38,7 @@ export function ReportModal({
 }: ReportModalProps) {
   const [showConfig, setShowConfig] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [activeTab, setActiveTab] = useState<'preview' | 'markdown'>('preview');
+  const [activeTab, setActiveTab] = useState<"preview" | "markdown">("preview");
 
   if (!isOpen) return null;
 
@@ -56,16 +56,16 @@ export function ReportModal({
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (error) {
-      console.error('Failed to copy to clipboard:', error);
+      console.error("Failed to copy to clipboard:", error);
     }
   };
 
   const handleDownloadMarkdown = () => {
-    const blob = new Blob([reportMarkdown], { type: 'text/markdown' });
+    const blob = new Blob([reportMarkdown], { type: "text/markdown" });
     const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
+    const link = document.createElement("a");
     link.href = url;
-    link.download = `security-report-${new Date().toISOString().split('T')[0]}.md`;
+    link.download = `security-report-${new Date().toISOString().split("T")[0]}.md`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -113,11 +113,11 @@ export function ReportModal({
 </body>
 </html>`;
 
-    const blob = new Blob([htmlContent], { type: 'text/html' });
+    const blob = new Blob([htmlContent], { type: "text/html" });
     const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
+    const link = document.createElement("a");
     link.href = url;
-    link.download = `security-report-${new Date().toISOString().split('T')[0]}.html`;
+    link.download = `security-report-${new Date().toISOString().split("T")[0]}.html`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -142,7 +142,7 @@ export function ReportModal({
               </p>
             </div>
           </div>
-          
+
           <div className="flex items-center space-x-2">
             <button
               onClick={() => setShowConfig(!showConfig)}
@@ -176,128 +176,134 @@ export function ReportModal({
 
         {/* Content */}
         <div className="flex-1 flex flex-col min-h-0">
-          {!reportMarkdown ? (
-            /* Generation Interface */
-            <div className="p-8 text-center">
-              <div className="max-w-md mx-auto">
-                <div className="p-4 bg-purple-100 dark:bg-purple-900/20 rounded-full w-20 h-20 mx-auto mb-6 flex items-center justify-center">
-                  <Sparkles className="w-10 h-10 text-purple-600 dark:text-purple-400" />
-                </div>
-                
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                  Generate AI Security Report
-                </h3>
-                
-                <p className="text-gray-600 dark:text-gray-300 mb-8">
-                  Create a comprehensive security analysis report with AI-powered insights, 
-                  recommendations, and actionable security measures based on your log analysis results.
-                </p>
-
-                {!canGenerate && (
-                  <div className="mb-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-                    <p className="text-sm text-yellow-800 dark:text-yellow-200">
-                      Please configure your AI provider settings above to generate reports.
-                    </p>
+          {!reportMarkdown
+            ? (
+              /* Generation Interface */
+              <div className="p-8 text-center">
+                <div className="max-w-md mx-auto">
+                  <div className="p-4 bg-purple-100 dark:bg-purple-900/20 rounded-full w-20 h-20 mx-auto mb-6 flex items-center justify-center">
+                    <Sparkles className="w-10 h-10 text-purple-600 dark:text-purple-400" />
                   </div>
-                )}
 
-                <button
-                  onClick={handleGenerateReport}
-                  disabled={isGenerating || !canGenerate}
-                  className="flex items-center justify-center space-x-2 px-8 py-3 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors mx-auto"
-                >
-                  {isGenerating ? (
-                    <>
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      <span>Generating Report...</span>
-                    </>
-                  ) : (
-                    <>
-                      <FileBarChart className="w-5 h-5" />
-                      <span>Generate Security Report</span>
-                    </>
+                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+                    Generate AI Security Report
+                  </h3>
+
+                  <p className="text-gray-600 dark:text-gray-300 mb-8">
+                    Create a comprehensive security analysis report with AI-powered insights, recommendations, and
+                    actionable security measures based on your log analysis results.
+                  </p>
+
+                  {!canGenerate && (
+                    <div className="mb-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+                      <p className="text-sm text-yellow-800 dark:text-yellow-200">
+                        Please configure your AI provider settings above to generate reports.
+                      </p>
+                    </div>
                   )}
-                </button>
-              </div>
-            </div>
-          ) : (
-            /* Report Display */
-            <div className="flex flex-col h-full">
-              {/* Tab Navigation */}
-              <div className="flex items-center justify-between px-6 py-3 border-b border-gray-200 dark:border-gray-700">
-                <div className="flex space-x-1">
-                  <button
-                    onClick={() => setActiveTab('preview')}
-                    className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-                      activeTab === 'preview'
-                        ? 'bg-purple-100 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300'
-                        : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
-                    }`}
-                  >
-                    Preview
-                  </button>
-                  <button
-                    onClick={() => setActiveTab('markdown')}
-                    className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-                      activeTab === 'markdown'
-                        ? 'bg-purple-100 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300'
-                        : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
-                    }`}
-                  >
-                    Markdown
-                  </button>
-                </div>
 
-                {/* Action Buttons */}
-                <div className="flex items-center space-x-2">
                   <button
-                    onClick={handleCopyMarkdown}
-                    className="flex items-center space-x-1 px-3 py-1 text-sm bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors"
+                    onClick={handleGenerateReport}
+                    disabled={isGenerating || !canGenerate}
+                    className="flex items-center justify-center space-x-2 px-8 py-3 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors mx-auto"
                   >
-                    {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                    <span>{copied ? 'Copied!' : 'Copy'}</span>
-                  </button>
-                  <button
-                    onClick={handleDownloadMarkdown}
-                    className="flex items-center space-x-1 px-3 py-1 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
-                  >
-                    <Download className="w-4 h-4" />
-                    <span>MD</span>
-                  </button>
-                  <button
-                    onClick={handleDownloadHTML}
-                    className="flex items-center space-x-1 px-3 py-1 text-sm bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
-                  >
-                    <Download className="w-4 h-4" />
-                    <span>HTML</span>
+                    {isGenerating
+                      ? (
+                        <>
+                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          <span>Generating Report...</span>
+                        </>
+                      )
+                      : (
+                        <>
+                          <FileBarChart className="w-5 h-5" />
+                          <span>Generate Security Report</span>
+                        </>
+                      )}
                   </button>
                 </div>
               </div>
-
-              {/* Report Content */}
-              <div className="flex-1 min-h-0">
-                {activeTab === 'preview' ? (
-                  <div 
-                    className="p-6 prose prose-lg max-w-none dark:prose-invert"
-                    dangerouslySetInnerHTML={{ 
-                      __html: marked(reportMarkdown, {
-                        breaks: true,
-                        gfm: true,
-                        headerIds: true,
-                        mangle: true,
-                      })
-                    }}
-                  />
-                ) : (
-                  <div className="p-6 h-full">
-                    <pre className="bg-gray-900 dark:bg-gray-950 text-gray-100 p-4 rounded-lg overflow-x-auto text-sm font-mono whitespace-pre-wrap border border-gray-700">
-                      {reportMarkdown}
-                    </pre>
+            )
+            : (
+              /* Report Display */
+              <div className="flex flex-col h-full">
+                {/* Tab Navigation */}
+                <div className="flex items-center justify-between px-6 py-3 border-b border-gray-200 dark:border-gray-700">
+                  <div className="flex space-x-1">
+                    <button
+                      onClick={() => setActiveTab("preview")}
+                      className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                        activeTab === "preview"
+                          ? "bg-purple-100 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300"
+                          : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                      }`}
+                    >
+                      Preview
+                    </button>
+                    <button
+                      onClick={() => setActiveTab("markdown")}
+                      className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                        activeTab === "markdown"
+                          ? "bg-purple-100 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300"
+                          : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                      }`}
+                    >
+                      Markdown
+                    </button>
                   </div>
-                )}
+
+                  {/* Action Buttons */}
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={handleCopyMarkdown}
+                      className="flex items-center space-x-1 px-3 py-1 text-sm bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors"
+                    >
+                      {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                      <span>{copied ? "Copied!" : "Copy"}</span>
+                    </button>
+                    <button
+                      onClick={handleDownloadMarkdown}
+                      className="flex items-center space-x-1 px-3 py-1 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                    >
+                      <Download className="w-4 h-4" />
+                      <span>MD</span>
+                    </button>
+                    <button
+                      onClick={handleDownloadHTML}
+                      className="flex items-center space-x-1 px-3 py-1 text-sm bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
+                    >
+                      <Download className="w-4 h-4" />
+                      <span>HTML</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Report Content */}
+                <div className="flex-1 min-h-0">
+                  {activeTab === "preview"
+                    ? (
+                      <div
+                        className="p-6 prose prose-lg max-w-none dark:prose-invert"
+                        dangerouslySetInnerHTML={{
+                          __html: marked(reportMarkdown, {
+                            breaks: true,
+                            gfm: true,
+                            headerIds: true,
+                            mangle: true,
+                          }),
+                        }}
+                      />
+                    )
+                    : (
+                      <div className="p-6 h-full">
+                        <pre className="bg-gray-900 dark:bg-gray-950 text-gray-100 p-4 rounded-lg overflow-x-auto text-sm font-mono whitespace-pre-wrap border border-gray-700">
+                      {reportMarkdown}
+                        </pre>
+                      </div>
+                    )}
+                </div>
               </div>
-            </div>
-          )}
+            )}
         </div>
       </div>
     </div>

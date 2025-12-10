@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { Sparkles, Brain, Settings, Plus, Wand2 } from 'lucide-react';
-import { LLMProviderSelector } from './LLMProviderSelector';
+import { Brain, Plus, Settings, Sparkles, Wand2 } from "lucide-react";
+import React, { useState } from "react";
+import { LLMProviderSelector } from "./LLMProviderSelector";
 
 interface DynamicAnalysisCardProps {
   onCreateAnalysis: (description: string) => void;
@@ -25,14 +25,14 @@ export function DynamicAnalysisCard({
   onCustomEndpointChange,
   canAnalyze,
 }: DynamicAnalysisCardProps) {
-  const [description, setDescription] = useState('');
+  const [description, setDescription] = useState("");
   const [showConfig, setShowConfig] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (description.trim() && canAnalyze) {
       onCreateAnalysis(description.trim());
-      setDescription('');
+      setDescription("");
     }
   };
 
@@ -61,7 +61,7 @@ export function DynamicAnalysisCard({
             </p>
           </div>
         </div>
-        
+
         <button
           onClick={() => setShowConfig(!showConfig)}
           className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
@@ -106,17 +106,19 @@ export function DynamicAnalysisCard({
           disabled={!description.trim() || isCreating || !canAnalyze}
           className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors"
         >
-          {isCreating ? (
-            <>
-              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              <span>Creating Analysis...</span>
-            </>
-          ) : (
-            <>
-              <Plus className="w-5 h-5" />
-              <span>Create Custom Analysis</span>
-            </>
-          )}
+          {isCreating
+            ? (
+              <>
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <span>Creating Analysis...</span>
+              </>
+            )
+            : (
+              <>
+                <Plus className="w-5 h-5" />
+                <span>Create Custom Analysis</span>
+              </>
+            )}
         </button>
       </form>
 

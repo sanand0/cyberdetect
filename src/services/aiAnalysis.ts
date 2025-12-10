@@ -1,5 +1,5 @@
-import { ProcessedLogEntry } from '../types';
-import { llmService, LLM_PROVIDERS } from './llmProviders';
+import { ProcessedLogEntry } from "../types";
+import { LLM_PROVIDERS, llmService } from "./llmProviders";
 
 export interface AIAnalysisConfig {
   providerId: string;
@@ -21,13 +21,13 @@ class AIAnalysisService {
       throw new Error(`API key is required for ${provider.name}`);
     }
 
-    if (provider.customEndpoint && config.providerId !== 'aipipe' && !config.customEndpoint?.trim()) {
+    if (provider.customEndpoint && config.providerId !== "aipipe" && !config.customEndpoint?.trim()) {
       throw new Error(`Custom endpoint is required for ${provider.name}`);
     }
 
     // Prepare threat summary for analysis
     const threatSummary = this.prepareThreatSummary(threats);
-    
+
     const prompt = `
 As a cybersecurity expert, analyze the following security threats detected in web server logs and provide comprehensive recommendations. Don't use bold formatting (**):
 
@@ -62,24 +62,24 @@ Please be specific and actionable in your recommendations. Focus on practical st
         {
           temperature: config.temperature || 0.7,
           maxTokens: config.maxTokens || 2048,
-        }
+        },
       );
 
       // Clean up the response to remove markdown code block fences
       let cleanedText = response.text.trim();
-      
+
       // Remove markdown code block delimiters if present
-      cleanedText = cleanedText.replace(/^```markdown\s*\n?/i, '');
-      cleanedText = cleanedText.replace(/^```\s*\n?/i, '');
-      cleanedText = cleanedText.replace(/\n?```\s*$/i, '');
-      
+      cleanedText = cleanedText.replace(/^```markdown\s*\n?/i, "");
+      cleanedText = cleanedText.replace(/^```\s*\n?/i, "");
+      cleanedText = cleanedText.replace(/\n?```\s*$/i, "");
+
       // Remove any leading/trailing whitespace after cleanup
       cleanedText = cleanedText.trim();
-      
+
       return cleanedText;
     } catch (error) {
-      console.error('AI Analysis failed:', error);
-      throw new Error(`Failed to get AI analysis: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      console.error("AI Analysis failed:", error);
+      throw new Error(`Failed to get AI analysis: ${error instanceof Error ? error.message : "Unknown error"}`);
     }
   }
 
@@ -122,11 +122,11 @@ Please be specific and actionable in your recommendations. Focus on practical st
     summary += `ATTACK TYPES DETECTED:\n`;
     Object.entries(threatsByType).forEach(([type, typeThreats]) => {
       summary += `- ${type}: ${typeThreats.length} attempts\n`;
-      
+
       // Show sample suspicious reasons for this attack type
       const reasons = [...new Set(typeThreats.map(t => t.suspicion_reason).filter(r => r))];
       if (reasons.length > 0) {
-        summary += `  Sample patterns: ${reasons.slice(0, 3).join(', ')}\n`;
+        summary += `  Sample patterns: ${reasons.slice(0, 3).join(", ")}\n`;
       }
     });
 
@@ -168,7 +168,7 @@ Please be specific and actionable in your recommendations. Focus on practical st
     }
 
     // Check if custom endpoint is required and provided (except for aipipe)
-    if (provider.customEndpoint && config.providerId !== 'aipipe' && !config.customEndpoint?.trim()) {
+    if (provider.customEndpoint && config.providerId !== "aipipe" && !config.customEndpoint?.trim()) {
       return false;
     }
 

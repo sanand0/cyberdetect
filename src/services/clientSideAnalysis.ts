@@ -1,6 +1,6 @@
-import { parseLogFile, ParsedLogEntry } from '../utils/logParser';
-import { DETECTORS, DetectorKey } from '../utils/detectors';
-import { ProcessedLogEntry } from '../types';
+import { ProcessedLogEntry } from "../types";
+import { DetectorKey, DETECTORS } from "../utils/detectors";
+import { ParsedLogEntry, parseLogFile } from "../utils/logParser";
 
 export interface AnalysisResult {
   count: number;
@@ -19,7 +19,7 @@ export class ClientSideAnalysisService {
   analyzeWithDetector(detectorKey: DetectorKey, limit: number = 500, offset: number = 0): AnalysisResult {
     const detector = DETECTORS[detectorKey];
     const suspicious = detector(this.parsedEntries);
-    
+
     // Convert to ProcessedLogEntry format
     const processedEntries: ProcessedLogEntry[] = suspicious.map(entry => ({
       ip: entry.ip,
@@ -28,12 +28,12 @@ export class ClientSideAnalysisService {
       path: entry.path,
       protocol: entry.protocol,
       status: parseInt(entry.status, 10),
-      bytes: parseInt(entry.bytes === '-' ? '0' : entry.bytes, 10),
+      bytes: parseInt(entry.bytes === "-" ? "0" : entry.bytes, 10),
       referrer: entry.referrer,
       user_agent: entry.user_agent,
       host: entry.host,
       server_ip: entry.server_ip,
-      suspicion_reason: entry.suspicion_reason || '',
+      suspicion_reason: entry.suspicion_reason || "",
       attack_type: this.getAttackTypeName(detectorKey),
     }));
 
@@ -46,14 +46,14 @@ export class ClientSideAnalysisService {
 
   private getAttackTypeName(detectorKey: DetectorKey): string {
     const nameMap: Record<DetectorKey, string> = {
-      'sql-injection': 'SQL Injection',
-      'path-traversal': 'Path Traversal',
-      'bots': 'Bot Detection',
-      'lfi-rfi': 'LFI/RFI Attacks',
-      'wp-probe': 'WordPress Probes',
-      'brute-force': 'Brute Force',
-      'errors': 'HTTP Errors',
-      'internal-ip': 'Internal IP Access',
+      "sql-injection": "SQL Injection",
+      "path-traversal": "Path Traversal",
+      "bots": "Bot Detection",
+      "lfi-rfi": "LFI/RFI Attacks",
+      "wp-probe": "WordPress Probes",
+      "brute-force": "Brute Force",
+      "errors": "HTTP Errors",
+      "internal-ip": "Internal IP Access",
     };
     return nameMap[detectorKey];
   }
@@ -61,7 +61,7 @@ export class ClientSideAnalysisService {
   // Batch analyze all types
   analyzeAllTypes(): Record<DetectorKey, AnalysisResult> {
     const results: Record<string, AnalysisResult> = {};
-    
+
     Object.keys(DETECTORS).forEach(key => {
       const detectorKey = key as DetectorKey;
       results[detectorKey] = this.analyzeWithDetector(detectorKey);

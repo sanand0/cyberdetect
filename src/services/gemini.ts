@@ -1,4 +1,4 @@
-import { ProcessedLogEntry } from '../types';
+import { ProcessedLogEntry } from "../types";
 
 interface GeminiResponse {
   candidates: Array<{
@@ -12,52 +12,55 @@ interface GeminiResponse {
 
 class GeminiService {
   private async makeRequest(prompt: string, apiKey: string): Promise<string> {
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        contents: [{
-          parts: [{
-            text: prompt
-          }]
-        }],
-        generationConfig: {
-          temperature: 0.7,
-          topK: 40,
-          topP: 0.95,
-          maxOutputTokens: 2048,
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-        safetySettings: [
-          {
-            category: "HARM_CATEGORY_HARASSMENT",
-            threshold: "BLOCK_MEDIUM_AND_ABOVE"
+        body: JSON.stringify({
+          contents: [{
+            parts: [{
+              text: prompt,
+            }],
+          }],
+          generationConfig: {
+            temperature: 0.7,
+            topK: 40,
+            topP: 0.95,
+            maxOutputTokens: 2048,
           },
-          {
-            category: "HARM_CATEGORY_HATE_SPEECH",
-            threshold: "BLOCK_MEDIUM_AND_ABOVE"
-          },
-          {
-            category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-            threshold: "BLOCK_MEDIUM_AND_ABOVE"
-          },
-          {
-            category: "HARM_CATEGORY_DANGEROUS_CONTENT",
-            threshold: "BLOCK_MEDIUM_AND_ABOVE"
-          }
-        ]
-      })
-    });
+          safetySettings: [
+            {
+              category: "HARM_CATEGORY_HARASSMENT",
+              threshold: "BLOCK_MEDIUM_AND_ABOVE",
+            },
+            {
+              category: "HARM_CATEGORY_HATE_SPEECH",
+              threshold: "BLOCK_MEDIUM_AND_ABOVE",
+            },
+            {
+              category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+              threshold: "BLOCK_MEDIUM_AND_ABOVE",
+            },
+            {
+              category: "HARM_CATEGORY_DANGEROUS_CONTENT",
+              threshold: "BLOCK_MEDIUM_AND_ABOVE",
+            },
+          ],
+        }),
+      },
+    );
 
     if (!response.ok) {
       throw new Error(`Gemini API error: ${response.status} ${response.statusText}`);
     }
 
     const data: GeminiResponse = await response.json();
-    
+
     if (!data.candidates || data.candidates.length === 0) {
-      throw new Error('No response from Gemini API');
+      throw new Error("No response from Gemini API");
     }
 
     return data.candidates[0].content.parts[0].text;
@@ -66,7 +69,7 @@ class GeminiService {
   async analyzeSecurityThreats(threats: ProcessedLogEntry[], apiKey: string): Promise<string> {
     // Prepare threat summary for analysis
     const threatSummary = this.prepareThreatSummary(threats);
-    
+
     const prompt = `
 As a cybersecurity expert, analyze the following security threats detected in web server logs and provide comprehensive recommendations, Don't use bold char (**):
 
@@ -94,18 +97,18 @@ Please be specific and actionable in your recommendations. Focus on practical st
     `;
 
     const response = await this.makeRequest(prompt, apiKey);
-    
+
     // Clean up the response to remove markdown code block fences
     let cleanedText = response.trim();
-    
+
     // Remove markdown code block delimiters if present
-    cleanedText = cleanedText.replace(/^```markdown\s*\n?/i, '');
-    cleanedText = cleanedText.replace(/^```\s*\n?/i, '');
-    cleanedText = cleanedText.replace(/\n?```\s*$/i, '');
-    
+    cleanedText = cleanedText.replace(/^```markdown\s*\n?/i, "");
+    cleanedText = cleanedText.replace(/^```\s*\n?/i, "");
+    cleanedText = cleanedText.replace(/\n?```\s*$/i, "");
+
     // Remove any leading/trailing whitespace after cleanup
     cleanedText = cleanedText.trim();
-    
+
     return cleanedText;
   }
 
@@ -148,11 +151,11 @@ Please be specific and actionable in your recommendations. Focus on practical st
     summary += `ATTACK TYPES DETECTED:\n`;
     Object.entries(threatsByType).forEach(([type, typeThreats]) => {
       summary += `- ${type}: ${typeThreats.length} attempts\n`;
-      
+
       // Show sample suspicious reasons for this attack type
       const reasons = [...new Set(typeThreats.map(t => t.suspicion_reason).filter(r => r))];
       if (reasons.length > 0) {
-        summary += `  Sample patterns: ${reasons.slice(0, 3).join(', ')}\n`;
+        summary += `  Sample patterns: ${reasons.slice(0, 3).join(", ")}\n`;
       }
     });
 

@@ -1,5 +1,5 @@
-import { useState, useRef, useCallback } from 'react';
-import { Toast } from '../types';
+import { useCallback, useRef, useState } from "react";
+import { Toast } from "../types";
 
 export function useToast() {
   const [toasts, setToasts] = useState<Toast[]>([]);
@@ -17,7 +17,7 @@ export function useToast() {
     setToasts(prev => prev.filter(toast => toast.id !== id));
   }, []);
 
-  const addToast = useCallback((message: string, type: Toast['type'] = 'info') => {
+  const addToast = useCallback((message: string, type: Toast["type"] = "info") => {
     const id = generateId();
     const newToast: Toast = { id, message, type };
 

@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { Download, Play, Database, ExternalLink, CheckCircle } from 'lucide-react';
-import JSZip from 'jszip';
-import pako from 'pako';
+import JSZip from "jszip";
+import { CheckCircle, Database, Download, ExternalLink, Play } from "lucide-react";
+import pako from "pako";
+import React, { useState } from "react";
 
 interface DemoDatasetCardProps {
   onLoadDemo: (file: File) => Promise<void>;
@@ -16,59 +16,59 @@ export function DemoDatasetCard({ onLoadDemo, isLoading }: DemoDatasetCardProps)
     try {
       // Fetch the file from the URL
       const response = await fetch(
-        'https://raw.githubusercontent.com/Yadav-Aayansh/gramener-datasets/refs/heads/add-server-logs/server_logs.zip',
+        "https://raw.githubusercontent.com/Yadav-Aayansh/gramener-datasets/refs/heads/add-server-logs/server_logs.zip",
       );
-      
+
       if (!response.ok) {
         throw new Error(`Failed to fetch demo dataset: ${response.statusText}`);
       }
-      
+
       const blob = await response.blob();
-      const file = new File([blob], 'server_logs.zip', { type: 'application/zip' });
-      
+      const file = new File([blob], "server_logs.zip", { type: "application/zip" });
+
       // Process the file with decompression logic
       await processAndLoadFile(file);
     } catch (error) {
-      console.error('Failed to load demo dataset:', error);
+      console.error("Failed to load demo dataset:", error);
     } finally {
       setIsLoadingDemo(false);
     }
   };
 
   const processAndLoadFile = async (file: File) => {
-    if (file.name.endsWith('.zip')) {
+    if (file.name.endsWith(".zip")) {
       try {
         const zip = await JSZip.loadAsync(file);
         const firstFile = Object.keys(zip.files)[0];
         if (firstFile) {
           const decompressedFile = zip.file(firstFile);
           if (decompressedFile) {
-            const extractedBlob = await decompressedFile.async('blob');
-            const extractedFile = new File([extractedBlob], decompressedFile.name, { type: 'text/plain' });
-            
+            const extractedBlob = await decompressedFile.async("blob");
+            const extractedFile = new File([extractedBlob], decompressedFile.name, { type: "text/plain" });
+
             // Call onLoadDemo with the extracted file
             await onLoadDemo(extractedFile);
             return;
           }
         }
       } catch (zipError) {
-        console.error('Failed to extract zip file:', zipError);
-        throw new Error('Failed to extract demo dataset');
+        console.error("Failed to extract zip file:", zipError);
+        throw new Error("Failed to extract demo dataset");
       }
-    } else if (file.name.endsWith('.gz')) {
+    } else if (file.name.endsWith(".gz")) {
       try {
         const arrayBuffer = await file.arrayBuffer();
         const compressedData = new Uint8Array(arrayBuffer);
         const decompressedData = pako.inflate(compressedData);
         const blob = new Blob([decompressedData]);
-        const newFileName = file.name.replace(/\.gz$/, '');
-        const newFile = new File([blob], newFileName, { type: 'text/plain' });
-        
+        const newFileName = file.name.replace(/\.gz$/, "");
+        const newFile = new File([blob], newFileName, { type: "text/plain" });
+
         await onLoadDemo(newFile);
         return;
       } catch (gzError) {
-        console.error('Failed to decompress gzip file:', gzError);
-        throw new Error('Failed to decompress demo dataset');
+        console.error("Failed to decompress gzip file:", gzError);
+        throw new Error("Failed to decompress demo dataset");
       }
     } else {
       // For non-compressed files, use the original flow
@@ -103,8 +103,8 @@ export function DemoDatasetCard({ onLoadDemo, isLoading }: DemoDatasetCardProps)
       </div>
 
       <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
-        Test the application with pre-generated Apache server logs containing various security threats and attack patterns. 
-        Perfect for exploring all detection capabilities without needing your own log files.
+        Test the application with pre-generated Apache server logs containing various security threats and attack
+        patterns. Perfect for exploring all detection capabilities without needing your own log files.
       </p>
 
       <div className="flex items-center justify-between">
@@ -124,17 +124,19 @@ export function DemoDatasetCard({ onLoadDemo, isLoading }: DemoDatasetCardProps)
           disabled={isLoading || isLoadingDemo}
           className="flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors"
         >
-          {isLoadingDemo ? (
-            <>
-              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              <span>Loading...</span>
-            </>
-          ) : (
-            <>
-              <Play className="w-4 h-4" />
-              <span>Load Demo</span>
-            </>
-          )}
+          {isLoadingDemo
+            ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <span>Loading...</span>
+              </>
+            )
+            : (
+              <>
+                <Play className="w-4 h-4" />
+                <span>Load Demo</span>
+              </>
+            )}
         </button>
       </div>
 

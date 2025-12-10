@@ -39,15 +39,15 @@ export interface ProcessedLogEntry {
 }
 
 // API Endpoints
-export type ScanEndpoint = 
-  | 'sql-injection'
-  | 'path-traversal' 
-  | 'bots'
-  | 'lfi-rfi'
-  | 'wp-probe'
-  | 'brute-force'
-  | 'errors'
-  | 'internal-ip';
+export type ScanEndpoint =
+  | "sql-injection"
+  | "path-traversal"
+  | "bots"
+  | "lfi-rfi"
+  | "wp-probe"
+  | "brute-force"
+  | "errors"
+  | "internal-ip";
 
 // Scan Request Parameters
 export interface ScanParams {
@@ -71,16 +71,16 @@ export interface Filters {
 export interface Toast {
   id: number;
   message: string;
-  type: 'success' | 'error' | 'info' | 'warning';
+  type: "success" | "error" | "info" | "warning";
 }
 
 // Analysis Summary
 export interface AnalysisSummary {
   totalThreats: number;
   attackTypeCounts: Record<string, number>;
-  topAttackers: Array<{ ip: string; count: number; }>;
+  topAttackers: Array<{ ip: string; count: number }>;
   statusCodeDistribution: Record<string, number>;
-  timelineData: Array<{ date: string; count: number; }>;
+  timelineData: Array<{ date: string; count: number }>;
 }
 
 // Saved Analysis
@@ -92,7 +92,7 @@ export interface SavedAnalysis {
 }
 
 // Theme Type
-export type Theme = 'light' | 'dark';
+export type Theme = "light" | "dark";
 
 // Dynamic Analysis
 export interface DynamicAnalysis {
@@ -107,7 +107,7 @@ export interface DynamicAnalysis {
 export interface AttackTypeConfig {
   name: string;
   description: string;
-  severity: 'high' | 'medium' | 'low';
+  severity: "high" | "medium" | "low";
   color: string;
   endpoint: ScanEndpoint;
 }

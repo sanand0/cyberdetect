@@ -1,6 +1,6 @@
-import React from 'react';
-import { Eye, Shield, AlertTriangle, Info, Play, CheckCircle, Code } from 'lucide-react';
-import { AttackTypeConfig } from '../types';
+import { AlertTriangle, CheckCircle, Code, Eye, Info, Play, Shield } from "lucide-react";
+import React from "react";
+import { AttackTypeConfig } from "../types";
 
 interface AttackTypeCardProps {
   config: AttackTypeConfig;
@@ -18,19 +18,21 @@ const severityIcons = {
   low: Info,
 };
 
-export function AttackTypeCard({ config, count, isLoading, onScan, onViewDetails, onViewFunction, hasResults }: AttackTypeCardProps) {
+export function AttackTypeCard(
+  { config, count, isLoading, onScan, onViewDetails, onViewFunction, hasResults }: AttackTypeCardProps,
+) {
   const SeverityIcon = severityIcons[config.severity];
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-200 hover:-translate-y-1 border border-gray-200 dark:border-gray-700 flex flex-col h-full">
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center space-x-3">
-          <div 
+          <div
             className="p-2 rounded-lg"
             style={{ backgroundColor: `${config.color}20` }}
           >
-            <SeverityIcon 
-              className="w-6 h-6" 
+            <SeverityIcon
+              className="w-6 h-6"
               style={{ color: config.color }}
             />
           </div>
@@ -38,12 +40,18 @@ export function AttackTypeCard({ config, count, isLoading, onScan, onViewDetails
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
               {config.name}
             </h3>
-            <span 
+            <span
               className={`
                 inline-block px-2 py-1 rounded-full text-xs font-medium
-                ${config.severity === 'high' ? 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300' : ''}
-                ${config.severity === 'medium' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300' : ''}
-                ${config.severity === 'low' ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300' : ''}
+                ${config.severity === "high" ? "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300" : ""}
+                ${
+                config.severity === "medium"
+                  ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300"
+                  : ""
+              }
+                ${
+                config.severity === "low" ? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300" : ""
+              }
               `}
             >
               {config.severity.toUpperCase()}
@@ -52,7 +60,7 @@ export function AttackTypeCard({ config, count, isLoading, onScan, onViewDetails
         </div>
         <div className="text-right">
           <div className="text-2xl font-bold text-gray-900 dark:text-white">
-            {isLoading ? '...' : count.toLocaleString()}
+            {isLoading ? "..." : count.toLocaleString()}
           </div>
           <div className="text-xs text-gray-500 dark:text-gray-400">
             instances
@@ -70,19 +78,21 @@ export function AttackTypeCard({ config, count, isLoading, onScan, onViewDetails
           disabled={isLoading}
           className="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-lg transition-colors"
         >
-          {hasResults ? (
-            <>
-              <CheckCircle className="w-4 h-4" />
-              <span>Rescan</span>
-            </>
-          ) : (
-            <>
-              <Play className="w-4 h-4" />
-              <span>Scan</span>
-            </>
-          )}
+          {hasResults
+            ? (
+              <>
+                <CheckCircle className="w-4 h-4" />
+                <span>Rescan</span>
+              </>
+            )
+            : (
+              <>
+                <Play className="w-4 h-4" />
+                <span>Scan</span>
+              </>
+            )}
         </button>
-        
+
         {hasResults && (
           <button
             onClick={onViewDetails}
@@ -92,7 +102,7 @@ export function AttackTypeCard({ config, count, isLoading, onScan, onViewDetails
             <span>View Results ({count})</span>
           </button>
         )}
-        
+
         {onViewFunction && (
           <button
             onClick={onViewFunction}

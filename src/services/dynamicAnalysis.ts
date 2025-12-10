@@ -1,6 +1,6 @@
-import { llmService, LLM_PROVIDERS } from './llmProviders';
-import { ParsedLogEntry } from '../utils/logParser';
-import { ProcessedLogEntry, DynamicAnalysis } from '../types';
+import { DynamicAnalysis, ProcessedLogEntry } from "../types";
+import { ParsedLogEntry } from "../utils/logParser";
+import { LLM_PROVIDERS, llmService } from "./llmProviders";
 
 export interface DynamicAnalysisConfig {
   providerId: string;
@@ -24,7 +24,7 @@ class DynamicAnalysisService {
       throw new Error(`API key is required for ${provider.name}`);
     }
 
-    if (provider.customEndpoint && config.providerId !== 'aipipe' && !config.customEndpoint?.trim()) {
+    if (provider.customEndpoint && config.providerId !== "aipipe" && !config.customEndpoint?.trim()) {
       throw new Error(`Custom endpoint is required for ${provider.name}`);
     }
 
@@ -85,27 +85,27 @@ function detectThreats(entries) {
         {
           temperature: config.temperature || 0.3, // Lower temperature for more consistent code generation
           maxTokens: config.maxTokens || 1024,
-        }
+        },
       );
 
       // Extract the function code from the response
       let functionCode = response.text.trim();
-      
+
       // Clean up the response - remove markdown code blocks if present
-      functionCode = functionCode.replace(/^```javascript\s*\n?/i, '');
-      functionCode = functionCode.replace(/^```js\s*\n?/i, '');
-      functionCode = functionCode.replace(/^```\s*\n?/i, '');
-      functionCode = functionCode.replace(/\n?```\s*$/i, '');
+      functionCode = functionCode.replace(/^```javascript\s*\n?/i, "");
+      functionCode = functionCode.replace(/^```js\s*\n?/i, "");
+      functionCode = functionCode.replace(/^```\s*\n?/i, "");
+      functionCode = functionCode.replace(/\n?```\s*$/i, "");
       functionCode = functionCode.trim();
-      
+
       // Validate that we have a function
-      if (!functionCode.includes('function detectThreats')) {
-        throw new Error('Generated code does not contain the required detectThreats function');
+      if (!functionCode.includes("function detectThreats")) {
+        throw new Error("Generated code does not contain the required detectThreats function");
       }
 
       // Create a unique ID for this analysis
       const id = `dynamic-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-      
+
       // Generate a name from the description
       const name = this.generateAnalysisName(description);
 
@@ -122,30 +122,33 @@ function detectThreats(entries) {
 
       return analysis;
     } catch (error) {
-      console.error('Dynamic analysis creation failed:', error);
-      throw new Error(`Failed to create analysis: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      console.error("Dynamic analysis creation failed:", error);
+      throw new Error(`Failed to create analysis: ${error instanceof Error ? error.message : "Unknown error"}`);
     }
   }
 
   async runAnalysis(analysisId: string, entries: ParsedLogEntry[]): Promise<ProcessedLogEntry[]> {
     const analysis = this.analyses.get(analysisId);
     if (!analysis) {
-      throw new Error('Analysis not found');
+      throw new Error("Analysis not found");
     }
 
     try {
       // Create a safe execution environment
-      const safeEval = new Function('entries', `
+      const safeEval = new Function(
+        "entries",
+        `
         ${analysis.functionCode}
         return detectThreats(entries);
-      `);
+      `,
+      );
 
       // Execute the generated function
       const results = safeEval(entries);
 
       // Validate results
       if (!Array.isArray(results)) {
-        throw new Error('Analysis function must return an array');
+        throw new Error("Analysis function must return an array");
       }
 
       // Convert to ProcessedLogEntry format
@@ -156,34 +159,73 @@ function detectThreats(entries) {
         path: entry.path,
         protocol: entry.protocol,
         status: parseInt(entry.status, 10),
-        bytes: parseInt(entry.bytes === '-' ? '0' : entry.bytes, 10),
+        bytes: parseInt(entry.bytes === "-" ? "0" : entry.bytes, 10),
         referrer: entry.referrer,
         user_agent: entry.user_agent,
         host: entry.host,
         server_ip: entry.server_ip,
-        suspicion_reason: entry.suspicion_reason || 'Custom analysis match',
+        suspicion_reason: entry.suspicion_reason || "Custom analysis match",
         attack_type: analysis.name,
       }));
     } catch (error) {
-      console.error('Analysis execution failed:', error);
-      throw new Error(`Failed to execute analysis: ${error instanceof Error ? error.message : 'Execution error'}`);
+      console.error("Analysis execution failed:", error);
+      throw new Error(`Failed to execute analysis: ${error instanceof Error ? error.message : "Execution error"}`);
     }
   }
 
   private generateAnalysisName(description: string): string {
     // Extract key terms and create a concise name
     const words = description.toLowerCase()
-      .replace(/[^\w\s]/g, ' ')
+      .replace(/[^\w\s]/g, " ")
       .split(/\s+/)
       .filter(word => word.length > 2)
-      .filter(word => !['the', 'and', 'for', 'are', 'but', 'not', 'you', 'all', 'can', 'had', 'her', 'was', 'one', 'our', 'out', 'day', 'get', 'has', 'him', 'his', 'how', 'man', 'new', 'now', 'old', 'see', 'two', 'way', 'who', 'boy', 'did', 'its', 'let', 'put', 'say', 'she', 'too', 'use'].includes(word));
+      .filter(word =>
+        ![
+          "the",
+          "and",
+          "for",
+          "are",
+          "but",
+          "not",
+          "you",
+          "all",
+          "can",
+          "had",
+          "her",
+          "was",
+          "one",
+          "our",
+          "out",
+          "day",
+          "get",
+          "has",
+          "him",
+          "his",
+          "how",
+          "man",
+          "new",
+          "now",
+          "old",
+          "see",
+          "two",
+          "way",
+          "who",
+          "boy",
+          "did",
+          "its",
+          "let",
+          "put",
+          "say",
+          "she",
+          "too",
+          "use",
+        ].includes(word)
+      );
 
     // Take first few meaningful words and capitalize
-    const nameWords = words.slice(0, 3).map(word => 
-      word.charAt(0).toUpperCase() + word.slice(1)
-    );
+    const nameWords = words.slice(0, 3).map(word => word.charAt(0).toUpperCase() + word.slice(1));
 
-    return nameWords.join(' ') + ' Analysis';
+    return nameWords.join(" ") + " Analysis";
   }
 
   canAnalyze(config: DynamicAnalysisConfig): boolean {
@@ -196,7 +238,7 @@ function detectThreats(entries) {
     }
 
     // Check if custom endpoint is required and provided (except for aipipe)
-    if (provider.customEndpoint && config.providerId === 'custom' && !config.customEndpoint?.trim()) {
+    if (provider.customEndpoint && config.providerId === "custom" && !config.customEndpoint?.trim()) {
       return false;
     }
 

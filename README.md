@@ -1,10 +1,10 @@
 # 🛡️ Cyber Detect
 
-> **Advanced Client-Side Security Log Analysis Platform**  
+> **Advanced Client-Side Security Log Analysis Platform**
 > Detect, analyze, and respond to cyber threats with AI-powered insights - all running securely in your browser.
 
-[![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-Visit_Now-blue?style=for-the-badge)](https://yadav-aayansh.github.io/cyberdetect/)
-[![GitHub Pages](https://img.shields.io/badge/Deployed_on-GitHub_Pages-green?style=for-the-badge&logo=github)](https://github.com/Yadav-Aayansh/cyberdetect)
+[![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-Visit_Now-blue?style=for-the-badge)](https://sanand0.github.io/cyberdetect/)
+[![GitHub Pages](https://img.shields.io/badge/Deployed_on-GitHub_Pages-green?style=for-the-badge&logo=github)](https://github.com/sanand0/cyberdetect)
 [![License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](LICENSE)
 
 ---
@@ -26,7 +26,7 @@
 
 ## 🚀 Live Demo
 
-Experience the platform instantly: **[https://yadav-aayansh.github.io/cyberdetect/](https://yadav-aayansh.github.io/cyberdetect/)**
+Experience the platform instantly: **[https://sanand0.github.io/cyberdetect/](https://sanand0.github.io/cyberdetect/)**
 
 Try it with our demo dataset or upload your own Apache/Nginx log files!
 
@@ -36,16 +36,16 @@ Try it with our demo dataset or upload your own Apache/Nginx log files!
 
 ### 🔍 Advanced Threat Detection
 
-| Attack Type | Severity | Description |
-|-------------|----------|-------------|
-| **SQL Injection** | 🔴 High | Advanced detection of union-based, boolean-based, time-based, and error-based SQL injection attempts |
-| **Path Traversal** | 🔴 High | Directory traversal attempts and suspicious path patterns |
-| **LFI/RFI Attacks** | 🔴 High | Local and Remote File Inclusion attack detection |
-| **Brute Force** | 🔴 High | Password brute force and credential stuffing detection |
-| **Bot Detection** | 🟡 Medium | Identification of crawlers, scrapers, and automated tools |
-| **WordPress Probes** | 🟡 Medium | WordPress-specific vulnerability scanning attempts |
-| **Internal IP Access** | 🟡 Medium | Detection of internal network access attempts |
-| **HTTP Errors** | 🟢 Low | Analysis of suspicious HTTP error patterns |
+| Attack Type            | Severity  | Description                                                                                          |
+| ---------------------- | --------- | ---------------------------------------------------------------------------------------------------- |
+| **SQL Injection**      | 🔴 High   | Advanced detection of union-based, boolean-based, time-based, and error-based SQL injection attempts |
+| **Path Traversal**     | 🔴 High   | Directory traversal attempts and suspicious path patterns                                            |
+| **LFI/RFI Attacks**    | 🔴 High   | Local and Remote File Inclusion attack detection                                                     |
+| **Brute Force**        | 🔴 High   | Password brute force and credential stuffing detection                                               |
+| **Bot Detection**      | 🟡 Medium | Identification of crawlers, scrapers, and automated tools                                            |
+| **WordPress Probes**   | 🟡 Medium | WordPress-specific vulnerability scanning attempts                                                   |
+| **Internal IP Access** | 🟡 Medium | Detection of internal network access attempts                                                        |
+| **HTTP Errors**        | 🟢 Low    | Analysis of suspicious HTTP error patterns                                                           |
 
 ### 🤖 AI-Powered Intelligence
 
@@ -132,7 +132,7 @@ graph TB
 
 ```bash
 # Clone the repository
-git clone https://github.com/Yadav-Aayansh/cyberdetect.git
+git clone https://github.com/sanand0/cyberdetect.git
 cd cyberdetect
 
 # Install dependencies
@@ -146,7 +146,7 @@ npm run dev
 
 1. **📁 Upload Log File**: Drag and drop your log file or try the demo dataset
 2. **🔍 Run Analysis**: Click "Run All Scans" or analyze specific threat types
-3. **📊 View Results**: 
+3. **📊 View Results**:
    - **Overview**: Attack type cards with threat counts
    - **Dashboard**: Interactive charts and visualizations
    - **Data Table**: Detailed, filterable results
@@ -161,6 +161,7 @@ IP - - [timestamp] "METHOD /path HTTP/1.1" status bytes "referrer" "user-agent" 
 ```
 
 **Example:**
+
 ```
 192.168.1.100 - - [01/Jan/2024:12:00:00 +0000] "GET /admin/login.php HTTP/1.1" 200 1234 "-" "Mozilla/5.0..." example.com 10.0.0.1
 ```
@@ -174,19 +175,24 @@ IP - - [timestamp] "METHOD /path HTTP/1.1" status bytes "referrer" "user-agent" 
 The platform supports multiple AI providers for enhanced analysis:
 
 #### Google Gemini (Recommended)
+
 ```javascript
 // Get your free API key from Google AI Studio
 const GEMINI_API_KEY = "your-gemini-api-key";
 ```
+
 🔗 [Get Gemini API Key](https://makersuite.google.com/app/apikey)
 
 #### OpenAI GPT
+
 ```javascript
 const OPENAI_API_KEY = "your-openai-api-key";
 ```
+
 🔗 [Get OpenAI API Key](https://platform.openai.com/api-keys)
 
 #### Custom Endpoints
+
 ```javascript
 const CUSTOM_ENDPOINT = "https://your-api-endpoint.com/v1/chat/completions";
 const API_KEY = "your-api-key";
@@ -204,23 +210,27 @@ VITE_BASE_PATH=/your-deployment-path/
 ## 📊 Detection Algorithms
 
 ### SQL Injection Detection
+
 - **Union-based injections**: `UNION SELECT` patterns
-- **Boolean-based blind**: Logic manipulation attempts  
+- **Boolean-based blind**: Logic manipulation attempts
 - **Time-based blind**: `SLEEP()`, `WAITFOR` functions
 - **Error-based**: Database error exploitation
 - **Authentication bypass**: Login circumvention attempts
 
 ### Path Traversal Detection
+
 - **Directory traversal**: `../` and encoded variants
 - **Excessive depth**: Unusual directory nesting
 - **System file access**: `/etc/passwd`, `/proc/` attempts
 
 ### Bot Detection
+
 - **Known crawlers**: Google, Bing, social media bots
 - **Client libraries**: curl, wget, Python requests
 - **Suspicious user agents**: Empty or malformed headers
 
 ### Advanced Pattern Matching
+
 - **Regex-based detection**: Sophisticated pattern recognition
 - **Whitelist filtering**: Reduce false positives
 - **Context-aware analysis**: Consider request context
@@ -240,12 +250,12 @@ VITE_BASE_PATH=/your-deployment-path/
 
 ### Benchmarks
 
-| Metric | Performance |
-|--------|-------------|
-| **Initial Load** | < 2 seconds |
-| **Log Processing** | ~1000 entries/second |
-| **Memory Usage** | < 100MB for 10K entries |
-| **Bundle Size** | < 2MB gzipped |
+| Metric             | Performance             |
+| ------------------ | ----------------------- |
+| **Initial Load**   | < 2 seconds             |
+| **Log Processing** | ~1000 entries/second    |
+| **Memory Usage**   | < 100MB for 10K entries |
+| **Bundle Size**    | < 2MB gzipped           |
 
 ---
 
@@ -281,11 +291,12 @@ npm run build
 npm run deploy
 ```
 
-🔗 **Live URL**: [https://yadav-aayansh.github.io/cyberdetect/](https://yadav-aayansh.github.io/cyberdetect/)
+🔗 **Live URL**: [https://sanand0.github.io/cyberdetect/](https://sanand0.github.io/cyberdetect/)
 
 ### Alternative Deployment Options
 
 #### Netlify
+
 ```bash
 # Build command
 npm run build
@@ -295,6 +306,7 @@ dist
 ```
 
 #### Vercel
+
 ```bash
 # Install Vercel CLI
 npm i -g vercel
@@ -304,6 +316,7 @@ vercel --prod
 ```
 
 #### Docker
+
 ```dockerfile
 FROM node:18-alpine
 WORKDIR /app
@@ -401,10 +414,10 @@ copies or substantial portions of the Software.
 
 ## 📊 Project Stats
 
-![GitHub stars](https://img.shields.io/github/stars/Yadav-Aayansh/cyberdetect?style=social)
-![GitHub forks](https://img.shields.io/github/forks/Yadav-Aayansh/cyberdetect?style=social)
-![GitHub issues](https://img.shields.io/github/issues/Yadav-Aayansh/cyberdetect)
-![GitHub pull requests](https://img.shields.io/github/issues-pr/Yadav-Aayansh/cyberdetect)
+![GitHub stars](https://img.shields.io/github/stars/sanand0/cyberdetect?style=social)
+![GitHub forks](https://img.shields.io/github/forks/sanand0/cyberdetect?style=social)
+![GitHub issues](https://img.shields.io/github/issues/sanand0/cyberdetect)
+![GitHub pull requests](https://img.shields.io/github/issues-pr/sanand0/cyberdetect)
 
 ---
 
@@ -412,12 +425,12 @@ copies or substantial portions of the Software.
 
 ### 🛡️ Secure Your Digital Assets Today
 
-**[Try Live Demo](https://yadav-aayansh.github.io/cyberdetect/)** • **[View Source](https://github.com/Yadav-Aayansh/cyberdetect)** • **[Report Issues](https://github.com/Yadav-Aayansh/cyberdetect/issues)**
+**[Try Live Demo](https://sanand0.github.io/cyberdetect/)** • **[View Source](https://github.com/sanand0/cyberdetect)** • **[Report Issues](https://github.com/sanand0/cyberdetect/issues)**
 
 ---
 
-**Made with ❤️ by [Aayansh Yadav](https://github.com/Yadav-Aayansh)**
+**Made with ❤️ by [Aayansh Yadav](https://github.com/sanand0)**
 
-*Empowering cybersecurity professionals with intelligent, privacy-first threat detection.*
+_Empowering cybersecurity professionals with intelligent, privacy-first threat detection._
 
 </div>

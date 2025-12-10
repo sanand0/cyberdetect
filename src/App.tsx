@@ -1,33 +1,33 @@
-import React, { useState, useMemo } from 'react';
-import { Shield, Moon, Sun, Key, Download, BarChart3, Database, FileText, Sparkles, FileBarChart } from 'lucide-react';
+import { BarChart3, Database, Download, FileBarChart, FileText, Key, Moon, Shield, Sparkles, Sun } from "lucide-react";
+import React, { useMemo, useState } from "react";
 
 // Components
-import { FileUpload } from './components/FileUpload';
-import { DemoDatasetCard } from './components/DemoDatasetCard';
-import { AttackTypeCard } from './components/AttackTypeCard';
-import { DynamicAnalysisCard } from './components/DynamicAnalysisCard';
-import { ReportModal } from './components/ReportModal';
-import { Dashboard } from './components/Dashboard';
-import { DataTable } from './components/DataTable';
-import { FacetedDataTable } from './components/FacetedDataTable';
-import { Modal } from './components/Modal';
-import { Toast } from './components/Toast';
-import { FunctionViewModal } from './components/FunctionViewModal';
+import { AttackTypeCard } from "./components/AttackTypeCard";
+import { Dashboard } from "./components/Dashboard";
+import { DataTable } from "./components/DataTable";
+import { DemoDatasetCard } from "./components/DemoDatasetCard";
+import { DynamicAnalysisCard } from "./components/DynamicAnalysisCard";
+import { FacetedDataTable } from "./components/FacetedDataTable";
+import { FileUpload } from "./components/FileUpload";
+import { FunctionViewModal } from "./components/FunctionViewModal";
+import { Modal } from "./components/Modal";
+import { ReportModal } from "./components/ReportModal";
+import { Toast } from "./components/Toast";
 
 // Hooks and utilities
-import { useTheme } from './hooks/useTheme';
-import { useToast } from './hooks/useToast';
-import { processLogData, exportToCSV, exportToJSON, downloadFile } from './utils/dataProcessing';
+import { useTheme } from "./hooks/useTheme";
+import { useToast } from "./hooks/useToast";
+import { downloadFile, exportToCSV, exportToJSON, processLogData } from "./utils/dataProcessing";
 
 // Services and config
-import { apiService } from './services/api';
-import { clientAnalysisService } from './services/clientSideAnalysis';
-import { dynamicAnalysisService } from './services/dynamicAnalysis';
-import { reportGenerationService } from './services/reportGeneration';
-import { ATTACK_TYPES } from './config/attackTypes';
+import { ATTACK_TYPES } from "./config/attackTypes";
+import { apiService } from "./services/api";
+import { clientAnalysisService } from "./services/clientSideAnalysis";
+import { dynamicAnalysisService } from "./services/dynamicAnalysis";
+import { reportGenerationService } from "./services/reportGeneration";
 
 // Types
-import { ProcessedLogEntry, Filters, AnalysisSummary, AttackTypeConfig, DynamicAnalysis } from './types';
+import { AnalysisSummary, AttackTypeConfig, DynamicAnalysis, Filters, ProcessedLogEntry } from "./types";
 
 function App() {
   const { theme, toggleTheme } = useTheme();
@@ -38,41 +38,43 @@ function App() {
   const [allResults, setAllResults] = useState<ProcessedLogEntry[]>([]);
   const [scanResults, setScanResults] = useState<Record<string, ProcessedLogEntry[]>>({});
   const [isScanning, setIsScanning] = useState<Record<string, boolean>>({});
-  
+
   // Dynamic Analysis state
   const [dynamicAnalyses, setDynamicAnalyses] = useState<DynamicAnalysis[]>([]);
   const [isCreatingAnalysis, setIsCreatingAnalysis] = useState(false);
-  const [selectedProvider, setSelectedProvider] = useState('gemini');
-  const [apiKey, setApiKey] = useState('');
-  const [customEndpoint, setCustomEndpoint] = useState('');
-  
-  const [activeView, setActiveView] = useState<'overview' | 'dashboard' | 'data'>('overview');
+  const [selectedProvider, setSelectedProvider] = useState("gemini");
+  const [apiKey, setApiKey] = useState("");
+  const [customEndpoint, setCustomEndpoint] = useState("");
+
+  const [activeView, setActiveView] = useState<"overview" | "dashboard" | "data">("overview");
   const [selectedAttackType, setSelectedAttackType] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
+
   // Function view modal state
   const [isFunctionModalOpen, setIsFunctionModalOpen] = useState(false);
-  const [selectedFunction, setSelectedFunction] = useState<{
-    title: string;
-    code: string;
-    description?: string;
-    isCustom?: boolean;
-  } | null>(null);
-  
+  const [selectedFunction, setSelectedFunction] = useState<
+    {
+      title: string;
+      code: string;
+      description?: string;
+      isCustom?: boolean;
+    } | null
+  >(null);
+
   // Report generation state
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [isGeneratingReport, setIsGeneratingReport] = useState(false);
-  const [reportMarkdown, setReportMarkdown] = useState('');
+  const [reportMarkdown, setReportMarkdown] = useState("");
 
   // Filters
   const [filters, setFilters] = useState<Filters>({
-    attackType: '',
-    statusCode: '',
-    ip: '',
-    dateRange: '',
-    severity: '',
-    search: '',
-    method: '',
+    attackType: "",
+    statusCode: "",
+    ip: "",
+    dateRange: "",
+    severity: "",
+    search: "",
+    method: "",
   });
 
   // Computed values
@@ -85,13 +87,13 @@ function App() {
     allResults.forEach(entry => {
       // Attack type counts
       attackTypeCounts[entry.attack_type] = (attackTypeCounts[entry.attack_type] || 0) + 1;
-      
+
       // IP counts
       ipCounts[entry.ip] = (ipCounts[entry.ip] || 0) + 1;
-      
+
       // Status code counts
       statusCounts[entry.status.toString()] = (statusCounts[entry.status.toString()] || 0) + 1;
-      
+
       // Timeline data (by date)
       const date = new Date(entry.timestamp).toDateString();
       timelineCounts[date] = (timelineCounts[date] || 0) + 1;
@@ -122,28 +124,28 @@ function App() {
     setScanResults({});
     // Clear any previous analysis data
     clientAnalysisService.clear();
-    addToast(`File "${file.name}" selected successfully`, 'success');
+    addToast(`File "${file.name}" selected successfully`, "success");
   };
 
   const handleLoadDemo = async (file: File): Promise<void> => {
     try {
-      addToast('Loading demo dataset...', 'info');
-      
+      addToast("Loading demo dataset...", "info");
+
       setSelectedFile(file);
       setAllResults([]);
       setScanResults({});
       clientAnalysisService.clear();
-      
-      addToast(`Demo dataset "${file.name}" loaded successfully!`, 'success');
+
+      addToast(`Demo dataset "${file.name}" loaded successfully!`, "success");
     } catch (error) {
-      console.error('Failed to load demo dataset:', error);
-      addToast(`Failed to load demo dataset: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error');
+      console.error("Failed to load demo dataset:", error);
+      addToast(`Failed to load demo dataset: ${error instanceof Error ? error.message : "Unknown error"}`, "error");
     }
   };
 
   const handleScan = async (attackType: AttackTypeConfig) => {
     if (!selectedFile) {
-      addToast('Please select a log file first', 'error');
+      addToast("Please select a log file first", "error");
       return;
     }
 
@@ -155,7 +157,7 @@ function App() {
       });
 
       const processedData = processLogData(response.results, attackType.name);
-      
+
       setScanResults(prev => ({
         ...prev,
         [attackType.name]: processedData,
@@ -167,10 +169,10 @@ function App() {
         return [...filtered, ...processedData];
       });
 
-      addToast(`${attackType.name} scan completed: ${processedData.length} threats found`, 'success');
+      addToast(`${attackType.name} scan completed: ${processedData.length} threats found`, "success");
     } catch (error) {
-      console.error('Scan failed:', error);
-      addToast(`Failed to scan for ${attackType.name}`, 'error');
+      console.error("Scan failed:", error);
+      addToast(`Failed to scan for ${attackType.name}`, "error");
     } finally {
       setIsScanning(prev => ({ ...prev, [attackType.name]: false }));
     }
@@ -178,12 +180,12 @@ function App() {
 
   const handleRunAll = async () => {
     if (!selectedFile) {
-      addToast('Please select a log file first', 'error');
+      addToast("Please select a log file first", "error");
       return;
     }
 
-    addToast('Starting comprehensive security scan...', 'info');
-    
+    addToast("Starting comprehensive security scan...", "info");
+
     // Clear previous results
     setAllResults([]);
     setScanResults({});
@@ -195,7 +197,7 @@ function App() {
     for (const attackType of ATTACK_TYPES) {
       try {
         setIsScanning(prev => ({ ...prev, [attackType.name]: true }));
-        
+
         const response = await apiService.scanLogs(attackType.endpoint, {
           file: selectedFile,
         });
@@ -203,7 +205,7 @@ function App() {
         const processedData = processLogData(response.results, attackType.name);
         totalThreats += processedData.length;
         completedScans++;
-        
+
         setScanResults(prev => ({
           ...prev,
           [attackType.name]: processedData,
@@ -213,11 +215,13 @@ function App() {
         setAllResults(prev => [...prev, ...processedData]);
 
         // Show progress
-        addToast(`${attackType.name}: ${processedData.length} threats found (${completedScans}/${ATTACK_TYPES.length})`, 'success');
-        
+        addToast(
+          `${attackType.name}: ${processedData.length} threats found (${completedScans}/${ATTACK_TYPES.length})`,
+          "success",
+        );
       } catch (error) {
         console.error(`Scan failed for ${attackType.name}:`, error);
-        addToast(`Failed to scan for ${attackType.name}`, 'error');
+        addToast(`Failed to scan for ${attackType.name}`, "error");
         completedScans++;
       } finally {
         setIsScanning(prev => ({ ...prev, [attackType.name]: false }));
@@ -225,7 +229,10 @@ function App() {
     }
 
     // Final summary
-    addToast(`Comprehensive scan completed! Found ${totalThreats} total threats across ${completedScans} attack types`, 'success');
+    addToast(
+      `Comprehensive scan completed! Found ${totalThreats} total threats across ${completedScans} attack types`,
+      "success",
+    );
   };
 
   const handleViewDetails = (attackType: string) => {
@@ -260,73 +267,74 @@ function App() {
 
   const getBuiltInDetectorCode = (attackType: string) => {
     const detectorMap: Record<string, { name: string; code: string; description: string }> = {
-      'SQL Injection': {
-        name: 'SQL Injection Detector',
-        description: 'Advanced SQL injection detection using pattern matching for union-based, boolean-based, time-based, and error-based attacks.',
+      "SQL Injection": {
+        name: "SQL Injection Detector",
+        description:
+          "Advanced SQL injection detection using pattern matching for union-based, boolean-based, time-based, and error-based attacks.",
         code: `export function detectSqlInjection(entries: ParsedLogEntry[]): ParsedLogEntry[] {
   const patterns = [
     // Union-based injections
     "union\\\\s+(all\\\\s+)?select",
     "select\\\\s+.*\\\\s+from",
     "select\\\\s+\\\\*",
-    
+
     // Boolean-based blind injections
     "(and|or)\\\\s+\\\\d+\\\\s*[=<>!]+\\\\s*\\\\d+",
     "(and|or)\\\\s+['\\\\\\\"]?[a-z]+['\\\\\\\"]?\\\\s*[=<>!]+\\\\s*['\\\\\\\"]?[a-z]+['\\\\\\\"]?",
     "(and|or)\\\\s+\\\\d+\\\\s*(and|or)\\\\s+\\\\d+",
-    
+
     // Time-based blind injections
     "(sleep|waitfor|delay)\\\\s*\\\\(\\\\s*\\\\d+\\\\s*\\\\)",
     "benchmark\\\\s*\\\\(\\\\s*\\\\d+",
     "pg_sleep\\\\s*\\\\(\\\\s*\\\\d+\\\\s*\\\\)",
-    
+
     // Error-based injections
     "(convert|cast|char)\\\\s*\\\\(",
     "concat\\\\s*\\\\(",
     "group_concat\\\\s*\\\\(",
     "having\\\\s+\\\\d+\\\\s*[=<>!]+\\\\s*\\\\d+",
-    
+
     // Authentication bypass
     "(admin|user|login)['\\\\\\\"]?\\\\s*(=|like)\\\\s*['\\\\\\\"]?\\\\s*(or|and)",
     "['\\\\\\\"]\\\\s*(or|and)\\\\s*['\\\\\\\"]?[^'\\\\\\\\"]*['\\\\\\\"]?\\\\s*(=|like)",
     "['\\\\\\\"]\\\\s*(or|and)\\\\s*\\\\d+\\\\s*[=<>!]+\\\\s*\\\\d+",
-    
+
     // SQL commands and functions
     "(drop|delete|truncate|insert|update)\\\\s+(table|from|into)",
     "(exec|execute|sp_|xp_)\\\\w*",
     "(information_schema|sys\\\\.|mysql\\\\.|pg_)",
     "(load_file|into\\\\s+outfile|dumpfile)",
-    
+
     // Comment patterns
     "(--|#|\\\\*/|\\\\*\\\\*)",
     "/\\\\*.*\\\\*/",
-    
+
     // Special characters and encodings
     "(%27|%22|%2d%2d|%23)",
     "(0x[0-9a-f]+)",
     "(char\\\\s*\\\\(\\\\s*\\\\d+)",
   ];
-  
+
   const sqliRegex = new RegExp(
     patterns.map(pattern => \`(\${pattern})\`).join('|'),
     'gim'
   );
-  
+
   const suspicious = entries.filter(entry => {
     if (!entry.path) return false;
     const decodedPath = decodeURIComponent(entry.path);
     return sqliRegex.test(decodedPath);
   });
-  
+
   return suspicious.map(entry => ({
     ...entry,
     suspicion_reason: 'SQL injection pattern detected'
   }));
-}`
+}`,
       },
-      'Path Traversal': {
-        name: 'Path Traversal Detector',
-        description: 'Detects directory traversal attempts and excessive path depth patterns.',
+      "Path Traversal": {
+        name: "Path Traversal Detector",
+        description: "Detects directory traversal attempts and excessive path depth patterns.",
         code: `export function detectPathTraversal(entries: ParsedLogEntry[]): ParsedLogEntry[] {
   const suspicious = entries.filter(entry => {
     const path = entry.path;
@@ -334,10 +342,10 @@ function App() {
 
     // Check for path traversal patterns
     const hasTraversalPattern = new RegExp('(\\\\.\\\\./|%2e%2e%2f|%2e%2f|%2f\\\\.\\\\.|/\\\\.{2})', 'i').test(path);
-    
+
     // Check for excessive directory depth
     const hasExcessiveDepth = (path.match(/\\//g) || []).length > 15;
-    
+
     return hasTraversalPattern || hasExcessiveDepth;
   });
 
@@ -345,11 +353,11 @@ function App() {
     ...entry,
     suspicion_reason: 'Path traversal pattern detected'
   }));
-}`
+}`,
       },
-      'Bot Detection': {
-        name: 'Bot Detection Function',
-        description: 'Identifies automated bots, crawlers, and suspicious user agents.',
+      "Bot Detection": {
+        name: "Bot Detection Function",
+        description: "Identifies automated bots, crawlers, and suspicious user agents.",
         code: `export function detectBots(entries: ParsedLogEntry[]): ParsedLogEntry[] {
   const CRAWLERS = [
     'googlebot', 'bingbot', 'baiduspider', 'yandexbot',
@@ -365,19 +373,19 @@ function App() {
 
   function classifyUserAgent(ua: string): string | null {
     const userAgent = ua.toLowerCase();
-    
+
     if (CRAWLERS.some(crawler => userAgent.includes(crawler))) {
       return "Crawler Bot";
     }
-    
+
     if (CLIENT_LIBS.some(lib => userAgent.includes(lib))) {
       return "Client Library Bot";
     }
-    
+
     if (userAgent.trim() === '' || userAgent.length < 10 || !userAgent.includes('mozilla')) {
       return "Suspicious User-Agent";
     }
-    
+
     return null;
   }
 
@@ -390,11 +398,11 @@ function App() {
     ...entry,
     suspicion_reason: classifyUserAgent(entry.user_agent) || 'Bot detected'
   }));
-}`
+}`,
       },
-      'LFI/RFI Attacks': {
-        name: 'LFI/RFI Attack Detector',
-        description: 'Detects Local File Inclusion and Remote File Inclusion attack patterns.',
+      "LFI/RFI Attacks": {
+        name: "LFI/RFI Attack Detector",
+        description: "Detects Local File Inclusion and Remote File Inclusion attack patterns.",
         code: `export function detectLfiRfi(entries: ParsedLogEntry[]): ParsedLogEntry[] {
   const pattern = /(etc\\/passwd|proc\\/self\\/environ|input_file=|data:text)/i;
 
@@ -406,11 +414,11 @@ function App() {
     ...entry,
     suspicion_reason: 'LFI/RFI pattern detected'
   }));
-}`
+}`,
       },
-      'WordPress Probes': {
-        name: 'WordPress Probe Detector',
-        description: 'Identifies WordPress-specific vulnerability scanning and probing attempts.',
+      "WordPress Probes": {
+        name: "WordPress Probe Detector",
+        description: "Identifies WordPress-specific vulnerability scanning and probing attempts.",
         code: `export function detectWpProbe(entries: ParsedLogEntry[]): ParsedLogEntry[] {
   const pattern = /(\\.php|\\/wp-|xmlrpc\\.php|\\?author=|\\?p=)/i;
 
@@ -422,11 +430,11 @@ function App() {
     ...entry,
     suspicion_reason: 'WordPress probe detected'
   }));
-}`
+}`,
       },
-      'Brute Force': {
-        name: 'Brute Force Attack Detector',
-        description: 'Detects brute force login attempts and credential stuffing attacks.',
+      "Brute Force": {
+        name: "Brute Force Attack Detector",
+        description: "Detects brute force login attempts and credential stuffing attacks.",
         code: `export function detectBruteForce(entries: ParsedLogEntry[]): ParsedLogEntry[] {
   const loginPattern = /(login|admin|signin|wp-login\\.php)/i;
   const badStatuses = ['401', '403', '429'];
@@ -439,11 +447,11 @@ function App() {
     ...entry,
     suspicion_reason: 'Brute force attempt detected'
   }));
-}`
+}`,
       },
-      'HTTP Errors': {
-        name: 'HTTP Error Detector',
-        description: 'Identifies suspicious HTTP error patterns and responses.',
+      "HTTP Errors": {
+        name: "HTTP Error Detector",
+        description: "Identifies suspicious HTTP error patterns and responses.",
         code: `export function detectErrors(entries: ParsedLogEntry[]): ParsedLogEntry[] {
   const badStatuses = ['403', '404', '406', '500', '502'];
 
@@ -455,11 +463,11 @@ function App() {
     ...entry,
     suspicion_reason: \`HTTP error status: \${entry.status}\`
   }));
-}`
+}`,
       },
-      'Internal IP Access': {
-        name: 'Internal IP Access Detector',
-        description: 'Detects access attempts from internal IP address ranges.',
+      "Internal IP Access": {
+        name: "Internal IP Access Detector",
+        description: "Detects access attempts from internal IP address ranges.",
         code: `export function detectInternalIp(entries: ParsedLogEntry[]): ParsedLogEntry[] {
   const internal = entries.filter(entry => {
     const ip = entry.ip;
@@ -473,8 +481,8 @@ function App() {
     ...entry,
     suspicion_reason: 'Internal IP address detected'
   }));
-}`
-      }
+}`,
+      },
     };
 
     return detectorMap[attackType] || null;
@@ -488,12 +496,12 @@ function App() {
     };
 
     if (!dynamicAnalysisService.canAnalyze(config)) {
-      addToast('Please configure your AI provider settings', 'error');
+      addToast("Please configure your AI provider settings", "error");
       return;
     }
 
     if (!selectedFile) {
-      addToast('Please select a log file first', 'error');
+      addToast("Please select a log file first", "error");
       return;
     }
 
@@ -502,10 +510,10 @@ function App() {
     try {
       const analysis = await dynamicAnalysisService.createAnalysis(description, config);
       setDynamicAnalyses(prev => [...prev, analysis]);
-      addToast(`Custom analysis "${analysis.name}" created successfully`, 'success');
+      addToast(`Custom analysis "${analysis.name}" created successfully`, "success");
     } catch (error) {
-      console.error('AI analysis failed:', error);
-      addToast(`Failed to create analysis: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error');
+      console.error("AI analysis failed:", error);
+      addToast(`Failed to create analysis: ${error instanceof Error ? error.message : "Unknown error"}`, "error");
     } finally {
       setIsCreatingAnalysis(false);
     }
@@ -513,7 +521,7 @@ function App() {
 
   const handleRunDynamicAnalysis = async (analysisId: string) => {
     if (!selectedFile) {
-      addToast('Please select a log file first', 'error');
+      addToast("Please select a log file first", "error");
       return;
     }
 
@@ -522,13 +530,13 @@ function App() {
     try {
       // Load the file into the client-side analysis service if not already loaded
       await clientAnalysisService.loadLogFile(selectedFile);
-      
+
       // Get parsed entries
       const entries = clientAnalysisService.getParsedEntries();
-      
+
       // Run the dynamic analysis
       const results = await dynamicAnalysisService.runAnalysis(analysisId, entries);
-      
+
       setScanResults(prev => ({
         ...prev,
         [analysisId]: results,
@@ -541,36 +549,36 @@ function App() {
       });
 
       const analysis = dynamicAnalysisService.getAnalysis(analysisId);
-      addToast(`${analysis?.name || 'Custom analysis'} completed: ${results.length} threats found`, 'success');
+      addToast(`${analysis?.name || "Custom analysis"} completed: ${results.length} threats found`, "success");
     } catch (error) {
-      console.error('Dynamic analysis failed:', error);
-      addToast(`Failed to run analysis: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error');
+      console.error("Dynamic analysis failed:", error);
+      addToast(`Failed to run analysis: ${error instanceof Error ? error.message : "Unknown error"}`, "error");
     } finally {
       setIsScanning(prev => ({ ...prev, [analysisId]: false }));
     }
   };
 
-  const handleExport = (format: 'csv' | 'json') => {
+  const handleExport = (format: "csv" | "json") => {
     if (allResults.length === 0) {
-      addToast('No data to export', 'error');
+      addToast("No data to export", "error");
       return;
     }
 
     try {
-      const timestamp = new Date().toISOString().split('T')[0];
+      const timestamp = new Date().toISOString().split("T")[0];
       const filename = `log-analysis-${timestamp}.${format}`;
-      
-      if (format === 'csv') {
+
+      if (format === "csv") {
         const csvContent = exportToCSV(allResults);
-        downloadFile(csvContent, filename, 'text/csv');
+        downloadFile(csvContent, filename, "text/csv");
       } else {
         const jsonContent = exportToJSON(allResults);
-        downloadFile(jsonContent, filename, 'application/json');
+        downloadFile(jsonContent, filename, "application/json");
       }
-      
-      addToast(`Data exported as ${format.toUpperCase()}`, 'success');
+
+      addToast(`Data exported as ${format.toUpperCase()}`, "success");
     } catch (error) {
-      addToast('Failed to export data', 'error');
+      addToast("Failed to export data", "error");
     }
   };
 
@@ -580,31 +588,31 @@ function App() {
     customEndpoint?: string;
   }) => {
     if (allResults.length === 0) {
-      addToast('No analysis data available to generate report', 'error');
+      addToast("No analysis data available to generate report", "error");
       return;
     }
 
     setIsGeneratingReport(true);
-    setReportMarkdown(''); // Clear previous report
+    setReportMarkdown(""); // Clear previous report
 
     try {
       const markdown = await reportGenerationService.generateReport(
         allResults,
         summary,
-        'https://raw.githubusercontent.com/Yadav-Aayansh/gramener-datasets/add-server-logs/server_logs.zip',
+        "https://raw.githubusercontent.com/Yadav-Aayansh/gramener-datasets/add-server-logs/server_logs.zip",
         selectedFile?.name,
         {
           providerId: config.providerId,
           apiKey: config.apiKey,
           customEndpoint: config.customEndpoint,
-        }
+        },
       );
-      
+
       setReportMarkdown(markdown);
-      addToast('Security report generated successfully', 'success');
+      addToast("Security report generated successfully", "success");
     } catch (error) {
-      console.error('Report generation failed:', error);
-      addToast(`Failed to generate report: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error');
+      console.error("Report generation failed:", error);
+      addToast(`Failed to generate report: ${error instanceof Error ? error.message : "Unknown error"}`, "error");
     } finally {
       setIsGeneratingReport(false);
     }
@@ -627,9 +635,9 @@ function App() {
   const modalData = selectedAttackType ? scanResults[selectedAttackType] || [] : [];
 
   return (
-    <div className={`min-h-screen transition-colors duration-200 ${
-      theme === 'dark' ? 'dark bg-gray-900' : 'bg-gray-50'
-    }`}>
+    <div
+      className={`min-h-screen transition-colors duration-200 ${theme === "dark" ? "dark bg-gray-900" : "bg-gray-50"}`}
+    >
       {/* Header */}
       <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -640,7 +648,7 @@ function App() {
               </div>
               <div>
                 <h1 className="text-xl font-bold text-gray-900 dark:text-white">
-                 Cyber Detect
+                  Cyber Detect
                 </h1>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
                   Advanced Security Log Analysis
@@ -660,14 +668,14 @@ function App() {
                     <span>Report</span>
                   </button>
                   <button
-                    onClick={() => handleExport('csv')}
+                    onClick={() => handleExport("csv")}
                     className="flex items-center space-x-1 px-3 py-1 text-sm bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
                   >
                     <Download className="w-4 h-4" />
                     <span>CSV</span>
                   </button>
                   <button
-                    onClick={() => handleExport('json')}
+                    onClick={() => handleExport("json")}
                     className="flex items-center space-x-1 px-3 py-1 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
                   >
                     <Download className="w-4 h-4" />
@@ -681,7 +689,7 @@ function App() {
                 onClick={toggleTheme}
                 className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
               >
-                {theme === 'light' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
+                {theme === "light" ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
               </button>
             </div>
           </div>
@@ -693,17 +701,17 @@ function App() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex space-x-8">
             {[
-              { id: 'overview', label: 'Overview', icon: Shield },
-              { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
-              { id: 'data', label: 'Data Table', icon: Database },
+              { id: "overview", label: "Overview", icon: Shield },
+              { id: "dashboard", label: "Dashboard", icon: BarChart3 },
+              { id: "data", label: "Data Table", icon: Database },
             ].map(({ id, label, icon: Icon }) => (
               <button
                 key={id}
                 onClick={() => setActiveView(id as any)}
                 className={`flex items-center space-x-2 px-3 py-4 text-sm font-medium border-b-2 transition-colors ${
                   activeView === id
-                    ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
+                    ? "border-blue-500 text-blue-600 dark:text-blue-400"
+                    : "border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
                 }`}
               >
                 <Icon className="w-4 h-4" />
@@ -716,14 +724,14 @@ function App() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {activeView === 'overview' && (
+        {activeView === "overview" && (
           <div className="space-y-8">
             {/* File Upload */}
             <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
               <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
                 Upload Log File or Try Demo
               </h2>
-              
+
               {/* Demo Dataset Card */}
               <div className="mb-6">
                 <DemoDatasetCard
@@ -731,7 +739,7 @@ function App() {
                   isLoading={Object.values(isScanning).some(Boolean)}
                 />
               </div>
-              
+
               {/* Divider */}
               <div className="relative my-6">
                 <div className="absolute inset-0 flex items-center">
@@ -743,14 +751,14 @@ function App() {
                   </span>
                 </div>
               </div>
-              
+
               {/* File Upload */}
               <FileUpload
                 onFileSelect={handleFileSelect}
-                acceptedTypes={['.log', '.txt', '*/*']}
+                acceptedTypes={[".log", ".txt", "*/*"]}
                 maxSize={100 * 1024 * 1024} // 100MB
               />
-              
+
               {selectedFile && (
                 <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                   <p className="text-sm text-blue-800 dark:text-blue-200">
@@ -783,17 +791,19 @@ function App() {
                       disabled={Object.values(isScanning).some(Boolean)}
                       className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
                     >
-                      {Object.values(isScanning).some(Boolean) ? (
-                        <>
-                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                          <span>Running Scans...</span>
-                        </>
-                      ) : (
-                        <>
-                          <Shield className="w-5 h-5" />
-                          <span>Run All Scans</span>
-                        </>
-                      )}
+                      {Object.values(isScanning).some(Boolean)
+                        ? (
+                          <>
+                            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                            <span>Running Scans...</span>
+                          </>
+                        )
+                        : (
+                          <>
+                            <Shield className="w-5 h-5" />
+                            <span>Run All Scans</span>
+                          </>
+                        )}
                     </button>
                   </div>
                 </div>
@@ -847,8 +857,8 @@ function App() {
                           config={{
                             name: analysis.name,
                             description: analysis.description,
-                            severity: 'medium' as const,
-                            color: '#7C3AED',
+                            severity: "medium" as const,
+                            color: "#7C3AED",
                             endpoint: analysis.id as any,
                           }}
                           count={scanResults[analysis.id]?.length || 0}
@@ -870,7 +880,7 @@ function App() {
           </div>
         )}
 
-        {activeView === 'dashboard' && (
+        {activeView === "dashboard" && (
           <Dashboard
             data={allResults}
             summary={summary}
@@ -878,7 +888,7 @@ function App() {
           />
         )}
 
-        {activeView === 'data' && (
+        {activeView === "data" && (
           <DataTable
             data={allResults}
             isLoading={Object.values(isScanning).some(Boolean)}
@@ -886,14 +896,15 @@ function App() {
             onFiltersChange={setFilters}
           />
         )}
-
       </main>
 
       {/* Modal for detailed results */}
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title={`${selectedAttackType && (dynamicAnalyses.find(a => a.id === selectedAttackType)?.name || selectedAttackType)} - Detailed Results`}
+        title={`${
+          selectedAttackType && (dynamicAnalyses.find(a => a.id === selectedAttackType)?.name || selectedAttackType)
+        } - Detailed Results`}
         size="xl"
       >
         <FacetedDataTable
@@ -908,7 +919,7 @@ function App() {
         isOpen={isReportModalOpen}
         onClose={() => {
           setIsReportModalOpen(false);
-          setReportMarkdown(''); // Clear report when closing
+          setReportMarkdown(""); // Clear report when closing
         }}
         onGenerateReport={handleGenerateReport}
         isGenerating={isGeneratingReport}
@@ -922,24 +933,22 @@ function App() {
         canGenerate={canGenerateReport}
       />
 
-    // Function View Modal
-    <FunctionViewModal
-      isOpen={isFunctionModalOpen}
-      onClose={() => {
-        setIsFunctionModalOpen(false);
-        setSelectedFunction(null);
-      }}
-      title={selectedFunction?.title || ''}
-      functionCode={selectedFunction?.code || ''}
-      description={selectedFunction?.description}
-      isCustom={selectedFunction?.isCustom || false}
-    />
+      {/* Function View Modal */}
+      <FunctionViewModal
+        isOpen={isFunctionModalOpen}
+        onClose={() => {
+          setIsFunctionModalOpen(false);
+          setSelectedFunction(null);
+        }}
+        title={selectedFunction?.title || ""}
+        functionCode={selectedFunction?.code || ""}
+        description={selectedFunction?.description}
+        isCustom={selectedFunction?.isCustom || false}
+      />
 
       {/* Toast Notifications */}
       <div className="fixed bottom-4 right-4 space-y-2 z-50">
-        {toasts.map((toast) => (
-          <Toast key={toast.id} toast={toast} onRemove={removeToast} />
-        ))}
+        {toasts.map((toast) => <Toast key={toast.id} toast={toast} onRemove={removeToast} />)}
       </div>
     </div>
   );

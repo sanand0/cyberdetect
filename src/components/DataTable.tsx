@@ -1,6 +1,6 @@
-import React, { useState, useMemo } from 'react';
-import { ChevronUp, ChevronDown, Search, Filter } from 'lucide-react';
-import { ProcessedLogEntry, Filters } from '../types';
+import { ChevronDown, ChevronUp, Filter, Search } from "lucide-react";
+import React, { useMemo, useState } from "react";
+import { Filters, ProcessedLogEntry } from "../types";
 
 interface DataTableProps {
   data: ProcessedLogEntry[];
@@ -22,8 +22,8 @@ interface Facets {
 }
 
 export function DataTable({ data, isLoading, filters, onFiltersChange }: DataTableProps) {
-  const [sortField, setSortField] = useState<keyof ProcessedLogEntry>('timestamp');
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
+  const [sortField, setSortField] = useState<keyof ProcessedLogEntry>("timestamp");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedFacets, setExpandedFacets] = useState<Record<string, boolean>>({
     attackType: true,
@@ -44,9 +44,9 @@ export function DataTable({ data, isLoading, filters, onFiltersChange }: DataTab
       statusCounts[entry.status.toString()] = (statusCounts[entry.status.toString()] || 0) + 1;
     });
 
-    const selectedAttackTypes = filters.attackType.split(',').filter(Boolean);
-    const selectedMethods = filters.method?.split(',').filter(Boolean) || [];
-    const selectedStatuses = filters.statusCode.split(',').filter(Boolean);
+    const selectedAttackTypes = filters.attackType.split(",").filter(Boolean);
+    const selectedMethods = filters.method?.split(",").filter(Boolean) || [];
+    const selectedStatuses = filters.statusCode.split(",").filter(Boolean);
 
     return {
       attackType: Object.entries(attackTypeCounts)
@@ -75,18 +75,17 @@ export function DataTable({ data, isLoading, filters, onFiltersChange }: DataTab
 
   const filteredData = useMemo(() => {
     return data.filter(entry => {
-      const selectedAttackTypes = filters.attackType.split(',').filter(Boolean);
-      const selectedMethods = filters.method?.split(',').filter(Boolean) || [];
-      const selectedStatuses = filters.statusCode.split(',').filter(Boolean);
+      const selectedAttackTypes = filters.attackType.split(",").filter(Boolean);
+      const selectedMethods = filters.method?.split(",").filter(Boolean) || [];
+      const selectedStatuses = filters.statusCode.split(",").filter(Boolean);
 
       const matchesAttackType = selectedAttackTypes.length === 0 || selectedAttackTypes.includes(entry.attack_type);
       const matchesMethod = selectedMethods.length === 0 || selectedMethods.includes(entry.method);
       const matchesStatus = selectedStatuses.length === 0 || selectedStatuses.includes(entry.status.toString());
       const matchesIp = !filters.ip || entry.ip.includes(filters.ip);
-      const matchesSearch = !filters.search || Object.values(entry).some(value => 
-        value.toString().toLowerCase().includes(filters.search.toLowerCase())
-      );
-      
+      const matchesSearch = !filters.search
+        || Object.values(entry).some(value => value.toString().toLowerCase().includes(filters.search.toLowerCase()));
+
       return matchesAttackType && matchesMethod && matchesStatus && matchesIp && matchesSearch;
     });
   }, [data, filters]);
@@ -95,9 +94,9 @@ export function DataTable({ data, isLoading, filters, onFiltersChange }: DataTab
     return [...filteredData].sort((a, b) => {
       const aValue = a[sortField];
       const bValue = b[sortField];
-      
-      if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
-      if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
+
+      if (aValue < bValue) return sortDirection === "asc" ? -1 : 1;
+      if (aValue > bValue) return sortDirection === "asc" ? 1 : -1;
       return 0;
     });
   }, [filteredData, sortField, sortDirection]);
@@ -111,23 +110,23 @@ export function DataTable({ data, isLoading, filters, onFiltersChange }: DataTab
 
   const handleSort = (field: keyof ProcessedLogEntry) => {
     if (sortField === field) {
-      setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+      setSortDirection(prev => prev === "asc" ? "desc" : "asc");
     } else {
       setSortField(field);
-      setSortDirection('asc');
+      setSortDirection("asc");
     }
     setCurrentPage(1);
   };
 
   const handleFacetToggle = (facetType: keyof Facets, value: string) => {
     let newValues: string[] = [];
-    
-    if (facetType === 'attackType') {
-      newValues = filters.attackType.split(',').filter(Boolean);
-    } else if (facetType === 'method') {
-      newValues = filters.method?.split(',').filter(Boolean) || [];
-    } else if (facetType === 'status') {
-      newValues = filters.statusCode.split(',').filter(Boolean);
+
+    if (facetType === "attackType") {
+      newValues = filters.attackType.split(",").filter(Boolean);
+    } else if (facetType === "method") {
+      newValues = filters.method?.split(",").filter(Boolean) || [];
+    } else if (facetType === "status") {
+      newValues = filters.statusCode.split(",").filter(Boolean);
     }
 
     if (newValues.includes(value)) {
@@ -137,12 +136,12 @@ export function DataTable({ data, isLoading, filters, onFiltersChange }: DataTab
     }
 
     const newFilters = { ...filters };
-    if (facetType === 'attackType') {
-      newFilters.attackType = newValues.join(',');
-    } else if (facetType === 'method') {
-      newFilters.method = newValues.join(',');
-    } else if (facetType === 'status') {
-      newFilters.statusCode = newValues.join(',');
+    if (facetType === "attackType") {
+      newFilters.attackType = newValues.join(",");
+    } else if (facetType === "method") {
+      newFilters.method = newValues.join(",");
+    } else if (facetType === "status") {
+      newFilters.statusCode = newValues.join(",");
     }
 
     onFiltersChange(newFilters);
@@ -151,12 +150,12 @@ export function DataTable({ data, isLoading, filters, onFiltersChange }: DataTab
 
   const clearFacet = (facetType: keyof Facets) => {
     const newFilters = { ...filters };
-    if (facetType === 'attackType') {
-      newFilters.attackType = '';
-    } else if (facetType === 'method') {
-      newFilters.method = '';
-    } else if (facetType === 'status') {
-      newFilters.statusCode = '';
+    if (facetType === "attackType") {
+      newFilters.attackType = "";
+    } else if (facetType === "method") {
+      newFilters.method = "";
+    } else if (facetType === "status") {
+      newFilters.statusCode = "";
     }
     onFiltersChange(newFilters);
     setCurrentPage(1);
@@ -175,10 +174,12 @@ export function DataTable({ data, isLoading, filters, onFiltersChange }: DataTab
 
   const SortIcon = ({ field }: { field: keyof ProcessedLogEntry }) => {
     if (sortField !== field) return null;
-    return sortDirection === 'asc' ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />;
+    return sortDirection === "asc" ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />;
   };
 
-  const FacetSection = ({ title, facetType, options }: { title: string; facetType: keyof Facets; options: FacetOption[] }) => {
+  const FacetSection = (
+    { title, facetType, options }: { title: string; facetType: keyof Facets; options: FacetOption[] },
+  ) => {
     const isExpanded = expandedFacets[facetType];
     const selectedCount = getSelectedCount(facetType);
     const displayOptions = isExpanded ? options : options.slice(0, 5);
@@ -207,10 +208,13 @@ export function DataTable({ data, isLoading, filters, onFiltersChange }: DataTab
             </button>
           )}
         </div>
-        
+
         <div className="space-y-2">
           {displayOptions.map(option => (
-            <label key={option.value} className="flex items-center space-x-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-1 rounded">
+            <label
+              key={option.value}
+              className="flex items-center space-x-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-1 rounded"
+            >
               <input
                 type="checkbox"
                 checked={option.selected}
@@ -225,7 +229,7 @@ export function DataTable({ data, isLoading, filters, onFiltersChange }: DataTab
               </span>
             </label>
           ))}
-          
+
           {!isExpanded && options.length > 5 && (
             <button
               onClick={() => toggleFacetExpansion(facetType)}
@@ -259,7 +263,16 @@ export function DataTable({ data, isLoading, filters, onFiltersChange }: DataTab
               Filters
             </h3>
             <button
-              onClick={() => onFiltersChange({ attackType: '', statusCode: '', ip: '', dateRange: '', severity: '', search: '', method: '' })}
+              onClick={() =>
+                onFiltersChange({
+                  attackType: "",
+                  statusCode: "",
+                  ip: "",
+                  dateRange: "",
+                  severity: "",
+                  search: "",
+                  method: "",
+                })}
               className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
             >
               Clear All
@@ -339,13 +352,13 @@ export function DataTable({ data, isLoading, filters, onFiltersChange }: DataTab
               <thead className="bg-gray-50 dark:bg-gray-700 sticky top-0 z-10">
                 <tr>
                   {[
-                    { key: 'ip', label: 'IP Address' },
-                    { key: 'timestamp', label: 'Timestamp' },
-                    { key: 'method', label: 'Method' },
-                    { key: 'path', label: 'Path' },
-                    { key: 'status', label: 'Status' },
-                    { key: 'attack_type', label: 'Attack Type' },
-                    { key: 'suspicion_reason', label: 'Suspicion Reason' },
+                    { key: "ip", label: "IP Address" },
+                    { key: "timestamp", label: "Timestamp" },
+                    { key: "method", label: "Method" },
+                    { key: "path", label: "Path" },
+                    { key: "status", label: "Status" },
+                    { key: "attack_type", label: "Attack Type" },
+                    { key: "suspicion_reason", label: "Suspicion Reason" },
                   ].map(({ key, label }) => (
                     <th
                       key={key}
@@ -370,11 +383,15 @@ export function DataTable({ data, isLoading, filters, onFiltersChange }: DataTab
                       {new Date(entry.timestamp).toLocaleString()}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        entry.method === 'GET' ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300' :
-                        entry.method === 'POST' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300' :
-                        'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
-                      }`}>
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          entry.method === "GET"
+                            ? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300"
+                            : entry.method === "POST"
+                            ? "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300"
+                            : "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300"
+                        }`}
+                      >
                         {entry.method}
                       </span>
                     </td>
@@ -384,13 +401,19 @@ export function DataTable({ data, isLoading, filters, onFiltersChange }: DataTab
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        entry.status >= 200 && entry.status < 300 ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300' :
-                        entry.status >= 300 && entry.status < 400 ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300' :
-                        entry.status >= 400 && entry.status < 500 ? 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300' :
-                        entry.status >= 500 ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-300' :
-                        'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
-                      }`}>
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          entry.status >= 200 && entry.status < 300
+                            ? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300"
+                            : entry.status >= 300 && entry.status < 400
+                            ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300"
+                            : entry.status >= 400 && entry.status < 500
+                            ? "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300"
+                            : entry.status >= 500
+                            ? "bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-300"
+                            : "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300"
+                        }`}
+                      >
                         {entry.status}
                       </span>
                     </td>

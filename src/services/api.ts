@@ -1,6 +1,6 @@
-import { ApiResponse, LogEntry, ScanEndpoint, ScanParams, ProcessedLogEntry } from '../types';
-import { clientAnalysisService, AnalysisResult } from './clientSideAnalysis';
-import { processLogData } from '../utils/dataProcessing';
+import { ApiResponse, LogEntry, ProcessedLogEntry, ScanEndpoint, ScanParams } from "../types";
+import { processLogData } from "../utils/dataProcessing";
+import { AnalysisResult, clientAnalysisService } from "./clientSideAnalysis";
 
 class ApiService {
   // Now using client-side analysis instead of server requests
@@ -30,70 +30,72 @@ class ApiService {
 
   async scanLogs(
     scanType: ScanEndpoint,
-    params: ScanParams
+    params: ScanParams,
   ): Promise<ApiResponse<LogEntry>> {
     // Load the file into the client-side analysis service
     await clientAnalysisService.loadLogFile(params.file);
-    
+
     // Run the analysis client-side
     const result = clientAnalysisService.analyzeWithDetector(scanType);
-    
+
     // Convert to the expected API response format
     return this.convertToApiResponse(result);
   }
 
   // Convenience methods for each scan type
   async scanSqlInjection(params: ScanParams) {
-    return this.scanLogs('sql-injection', params);
+    return this.scanLogs("sql-injection", params);
   }
 
   async scanPathTraversal(params: ScanParams) {
-    return this.scanLogs('path-traversal', params);
+    return this.scanLogs("path-traversal", params);
   }
 
   async scanBots(params: ScanParams) {
-    return this.scanLogs('bots', params);
+    return this.scanLogs("bots", params);
   }
 
   async scanLfiRfi(params: ScanParams) {
-    return this.scanLogs('lfi-rfi', params);
+    return this.scanLogs("lfi-rfi", params);
   }
 
   async scanWpProbe(params: ScanParams) {
-    return this.scanLogs('wp-probe', params);
+    return this.scanLogs("wp-probe", params);
   }
 
   async scanBruteForce(params: ScanParams) {
-    return this.scanLogs('brute-force', params);
+    return this.scanLogs("brute-force", params);
   }
 
   async scanErrors(params: ScanParams) {
-    return this.scanLogs('errors', params);
+    return this.scanLogs("errors", params);
   }
 
   async scanInternalIp(params: ScanParams) {
-    return this.scanLogs('internal-ip', params);
+    return this.scanLogs("internal-ip", params);
   }
 
   // Batch scan all types
-  async scanAllTypes(file: File): Promise<{
-    [K in ScanEndpoint]: ApiResponse<LogEntry>;
-  }> {
+  async scanAllTypes(file: File): Promise<
+    {
+      [K in ScanEndpoint]: ApiResponse<LogEntry>;
+    }
+  > {
     // Load the file once
     await clientAnalysisService.loadLogFile(file);
-    
+
     // Run all analyses
     const results = clientAnalysisService.analyzeAllTypes();
 
     return {
-      'sql-injection': this.convertToApiResponse(results['sql-injection']),
-      'path-traversal': this.convertToApiResponse(results['path-traversal']),
-      'bots': this.convertToApiResponse(results['bots']),
-      'lfi-rfi': this.convertToApiResponse(results['lfi-rfi']),
-      'wp-probe': this.convertToApiResponse(results['wp-probe']),
-      'brute-force': this.convertToApiResponse(results['brute-force']),
-      'errors': this.convertToApiResponse(results['errors']),
-      'internal-ip': this.convertToApiResponse(results['internal-ip']),
+      "sql-injection": this.convertToApiResponse(results["sql-injection"]),
+      "path-traversal": this.convertToApiResponse(results["path-traversal"]),
+      "bots": this.convertToApiResponse(results["bots"]),
+      "lfi-rfi": this.convertToApiResponse(results["lfi-rfi"]),
+      "wp-probe": this.convertToApiResponse(results["wp-probe"]),
+      "brute-force": this.convertToApiResponse(results["brute-force"]),
+      "errors": this.convertToApiResponse(results["errors"]),
+      "internal-ip": this.convertToApiResponse(results["internal-ip"]),
     };
   }
 }
